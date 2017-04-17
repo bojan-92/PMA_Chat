@@ -1,4 +1,4 @@
-package com.pma.chat.pma_chat;
+package com.pma.chat.pmaChat;
 
 import org.junit.Test;
 
