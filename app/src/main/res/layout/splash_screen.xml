@@ -34,7 +34,7 @@
         android:id="@+id/Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="PMA Chat"
+        android:text="@string/chat_splashName"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:fontFamily="casual"
         android:textStyle="normal|bold"
