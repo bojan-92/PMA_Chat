@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/usersTop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBar"
+        android:layout_marginBottom="470dp"
+        android:text="@string/userTitle"
+        android:textSize="25sp"
+        android:textAlignment="center"
+        android:contextClickable="true"
+        android:paddingTop="5dp"
+        android:textColor="@color/colorWhite"/>
+
+    <TextView
+        android:id="@+id/users"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBar"
+        android:layout_marginTop="450dp"
+        android:text="@string/userOpt"
+        android:textSize="26sp"
+        android:textAlignment="center"
+        android:contextClickable="true"
+        android:paddingTop="15dp"
+        android:textColor="@color/colorWhite"/>
+    <TextView
+        android:id="@+id/user1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimaryDark"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="390dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:text="@string/userTxt"
+        android:textSize="22sp"
+        android:paddingTop="20sp"
+        android:paddingLeft="100dp"
+        android:textColor="@color/colorWhite"
+        />
+
+    <TextView
+        android:id="@+id/user1b"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBar"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="390dp"
+        android:layout_marginRight="300dp"
+        android:layout_marginLeft="5dp"
+        android:text="@string/userImg"
+        android:textSize="22sp"
+        android:padding="20sp"
+        android:textColor="@color/colorWhite"/>
+
+
+    <TextView
+        android:id="@+id/user2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimaryDark"
+        android:layout_marginTop="130dp"
+        android:layout_marginBottom="310dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:text="@string/userTxt"
+        android:textSize="22sp"
+        android:paddingTop="20sp"
+        android:paddingLeft="100dp"
+        android:textColor="@color/colorWhite"
+        />
+
+    <TextView
+        android:id="@+id/user2b"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBar"
+        android:layout_marginTop="130dp"
+        android:layout_marginBottom="310dp"
+        android:layout_marginRight="300dp"
+        android:layout_marginLeft="5dp"
+        android:text="@string/userImg"
+        android:textSize="22sp"
+        android:padding="20sp"
+        android:textColor="@color/colorWhite"/>
+
+
+    <TextView
+        android:id="@+id/user3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimaryDark"
+        android:layout_marginTop="210dp"
+        android:layout_marginBottom="230dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:text="@string/userTxt"
+        android:textSize="22sp"
+        android:paddingTop="20sp"
+        android:paddingLeft="100dp"
+        android:textColor="@color/colorWhite"
+        />
+
+    <TextView
+        android:id="@+id/user3b"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBar"
+        android:layout_marginTop="210dp"
+        android:layout_marginBottom="230dp"
+        android:layout_marginRight="300dp"
+        android:layout_marginLeft="5dp"
+        android:text="@string/userImg"
+        android:textSize="22sp"
+        android:padding="20sp"
+        android:textColor="@color/colorWhite"/>
+
+
+    <TextView
+        android:id="@+id/user4"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimaryDark"
+        android:layout_marginTop="290dp"
+        android:layout_marginBottom="150dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:text="@string/userTxt"
+        android:textSize="22sp"
+        android:paddingTop="20sp"
+        android:paddingLeft="100dp"
+        android:textColor="@color/colorWhite"
+        />
+
+    <TextView
+        android:id="@+id/user4b"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBar"
+        android:layout_marginTop="290dp"
+        android:layout_marginBottom="150dp"
+        android:layout_marginRight="300dp"
+        android:layout_marginLeft="5dp"
+        android:text="@string/userImg"
+        android:textSize="22sp"
+        android:padding="20sp"
+        android:textColor="@color/colorWhite"/>
+
+
+    <TextView
+        android:id="@+id/user5"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimaryDark"
+        android:layout_marginTop="370dp"
+        android:layout_marginBottom="70dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:text="@string/userTxt"
+        android:textSize="22sp"
+        android:paddingTop="20sp"
+        android:paddingLeft="100dp"
+        android:textColor="@color/colorWhite"
+        />
+
+    <TextView
+        android:id="@+id/user5b"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBar"
+        android:layout_marginTop="370dp"
+        android:layout_marginBottom="70dp"
+        android:layout_marginRight="300dp"
+        android:layout_marginLeft="5dp"
+        android:text="@string/userImg"
+        android:textSize="22sp"
+        android:padding="20sp"
+        android:textColor="@color/colorWhite"/>
+
+</RelativeLayout>
