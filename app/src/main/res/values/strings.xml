@@ -4,5 +4,15 @@
     <string name="userOpt">CHAT SETTINGS CONTACT</string>
     <string name="userTxt">Username</string>
     <string name="userTitle">USERS</string>
+    <string name="userTitleFriendDetails">FRIEND DETAILS</string>
     <string name="userImg">Img</string>
+    <string name="userStartChat">START CHAT</string>
+    <string name="userFullName">Name: Full name</string>
+    <string name="userBirth">Birthday: 1.5.1990.</string>
+    <string name="userEditName">Username</string>
+    <string name="userEditPass">Password</string>
+    <string name="userConfPass">Confirm Password</string>
+    <string name="userEditBirth">Birthday</string>
+    <string name="userEdit">EDIT</string>
+    <string name="userTitleEdit">EDIT PROFILE</string>
 </resources>
