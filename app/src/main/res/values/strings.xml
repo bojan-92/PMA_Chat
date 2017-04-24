@@ -5,4 +5,13 @@
     <string name="userTxt">Username</string>
     <string name="userTitle">USERS</string>
     <string name="userImg">Img</string>
+    <string name="login">Log in</string>
+    <string name="loginUsername">Username</string>
+    <string name="loginPassword">Password</string>
+    <string name="signUp">Sign up</string>
+    <string name="firstName">First name</string>
+    <string name="lastName">Last name</string>
+    <string name="confirmPassword">Password confirm</string>
+    <string name="birthdayLabel">Birthday</string>
+    <string name="date_selected"></string>
 </resources>

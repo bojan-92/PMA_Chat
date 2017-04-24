@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.pma.chat.pmaChat.MainActivity;
 import com.pma.chat.pmaChat.R;
+import com.pma.chat.pmaChat.auth.LoginScreen;
 
 /**
  * Created by Bojan on 4/17/2017.
@@ -47,7 +48,7 @@ public class SplashScreen extends Activity {
                     }
                 }
                 if (progressStatus == 100) {
-                    Intent i = new Intent(SplashScreen.this, MainActivity.class);
+                    Intent i = new Intent(SplashScreen.this, LoginScreen.class);
                     startActivity(i);
                 }
             }
