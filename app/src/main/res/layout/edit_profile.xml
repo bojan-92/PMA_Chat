@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/usersTop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorAccent"
+        android:layout_marginBottom="470dp"
+        android:text="@string/userTitleEdit"
+        android:textSize="25sp"
+        android:textAlignment="center"
+        android:paddingTop="5dp"
+        android:textColor="#FFF"/>
+
+    <TextView
+        android:id="@+id/userEditNameDetails"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="100dp"
+        android:layout_marginBottom="380dp"
+        android:text="@string/userEditName"
+        android:textSize="25sp"
+        android:textAlignment="center"
+        android:contextClickable="true"
+        />
+
+    <TextView
+        android:id="@+id/userEditPassDetails"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="180dp"
+        android:layout_marginBottom="300dp"
+        android:text="@string/userEditPass"
+        android:textSize="25sp"
+        android:textAlignment="center"
+        android:contextClickable="true"
+        />
+
+    <TextView
+        android:id="@+id/userEditConfPassDetails"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="250dp"
+        android:layout_marginBottom="230dp"
+        android:text="@string/userConfPass"
+        android:textSize="25sp"
+        android:textAlignment="center"
+        android:contextClickable="true"
+        />
+
+
+    <TextView
+        android:id="@+id/userEditBirth"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="350dp"
+        android:layout_marginBottom="130dp"
+        android:text="@string/userEditBirth"
+        android:textSize="25sp"
+        android:textAlignment="center"
+        android:contextClickable="true"
+        />
+
+
+    <Button
+        android:id="@+id/chatButton"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorAccent"
+        android:layout_marginTop="450dp"
+        android:text="@string/userEdit"
+        android:textSize="26sp"
+        android:textAlignment="center"
+        android:contextClickable="true"
+        android:textColor="#FFF"/>
+
+    <EditText
+        android:id="@+id/editPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/userEditPassDetails"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="26dp"
+        android:ems="10"
+        android:inputType="textPassword" />
+
+
+
+    <EditText
+        android:id="@+id/editText3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/editPassword"
+        android:layout_alignEnd="@+id/editPassword"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Name" />
+
+    <EditText
+        android:id="@+id/editText4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/editPassword"
+        android:layout_alignTop="@+id/userEditConfPassDetails"
+        android:layout_marginTop="37dp"
+        android:ems="10"
+        android:inputType="textPassword" />
+
+    <EditText
+        android:id="@+id/editText5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/editText4"
+        android:layout_alignTop="@+id/userEditBirth"
+        android:layout_marginTop="43dp"
+        android:ems="10"
+        android:inputType="date" />
+
+
+</RelativeLayout>

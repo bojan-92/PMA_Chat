@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/usersTop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorAccent"
+        android:layout_marginBottom="470dp"
+        android:text="@string/userTitleFriendDetails"
+        android:textSize="25sp"
+        android:textAlignment="center"
+        android:contextClickable="true"
+        android:paddingTop="5dp"
+        android:textColor="#FFF"/>
+
+    <ImageView
+        android:id="@+id/imageViewProfile"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:layout_marginTop="40dp"
+        android:src="@drawable/friend_details"
+        android:background="@color/colorPrimaryDark"
+        />
+
+    <TextView
+        android:id="@+id/usersDetails"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="300dp"
+        android:layout_marginBottom="150dp"
+        android:text="@string/userFullName"
+        android:textSize="25sp"
+        android:textAlignment="center"
+        android:contextClickable="true"
+        android:paddingTop="5dp"
+        />
+
+    <TextView
+        android:id="@+id/usersDetails2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="350dp"
+        android:layout_marginBottom="100dp"
+        android:text="@string/userBirth"
+        android:textSize="25sp"
+        android:textAlignment="center"
+        android:contextClickable="true"
+        android:paddingTop="5dp"
+        />
+
+
+    <Button
+        android:id="@+id/chatButton"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorAccent"
+        android:layout_marginTop="450dp"
+        android:text="@string/userStartChat"
+        android:textSize="26sp"
+        android:textAlignment="center"
+        android:contextClickable="true"
+        android:textColor="#FFF"/>
+
+
+
+
+
+</RelativeLayout>
