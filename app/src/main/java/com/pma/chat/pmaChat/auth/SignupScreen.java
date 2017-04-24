@@ -26,7 +26,6 @@ public class SignupScreen extends Activity {
     private TextView dateView;
     private int year, month, day;
     Button datePicker;
-    EditText dateSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +33,6 @@ public class SignupScreen extends Activity {
         setContentView(R.layout.signup_screen);
 
         datePicker = (Button)findViewById(R.id.datePicker);
-        dateSelected = (EditText)findViewById(R.id.dateSelected);
 
         datePicker.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,7 +64,6 @@ public class SignupScreen extends Activity {
 
         String myFormat = "MM/dd/yy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-        dateSelected.setText(sdf.toString());
     }
 
 
