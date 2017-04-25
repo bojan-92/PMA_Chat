@@ -24,4 +24,11 @@
     <string name="userEditBirth">Birthday</string>
     <string name="userEdit">EDIT</string>
     <string name="userTitleEdit">EDIT PROFILE</string>
+    <string name="friendsList">Friends List</string>
+    <string name="chat">Chat</string>
+    <string name="profileSettings">Profile Settings</string>
+    <string name="exit">Exit</string>
+    <string name="chatMessageFieldPlaceholder">Type a message...</string>
+    <string name="chatMessageSendText">Send</string>
+
 </resources>
