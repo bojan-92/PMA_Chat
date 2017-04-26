@@ -42,11 +42,11 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".menu.HomeScreen" />
-        <activity android:name=".users.UsersScreen" />
-        <activity android:name=".users.ProfileSettingsScreen" />
-        <activity android:name=".chat.ChatScreen" />
-        <activity android:name=".users.FriendsProfile"></activity>
+        <activity android:name=".menu.HomeActivity" />
+        <activity android:name=".users.FriendsListActivity" />
+        <activity android:name=".users.ProfileSettingsActivity" />
+        <activity android:name=".chat.ChatActivity" />
+        <activity android:name=".users.FriendsProfileActivity"></activity>
     </application>
 
 </manifest>

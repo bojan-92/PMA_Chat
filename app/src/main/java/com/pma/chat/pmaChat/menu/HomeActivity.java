@@ -7,11 +7,11 @@ import android.view.View;
 import android.widget.Button;
 
 import com.pma.chat.pmaChat.R;
-import com.pma.chat.pmaChat.chat.ChatScreen;
-import com.pma.chat.pmaChat.users.ProfileSettingsScreen;
-import com.pma.chat.pmaChat.users.UsersScreen;
+import com.pma.chat.pmaChat.chat.ChatActivity;
+import com.pma.chat.pmaChat.users.ProfileSettingsActivity;
+import com.pma.chat.pmaChat.users.FriendsListActivity;
 
-public class HomeScreen extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity {
 
     Button btnFriendsList;
     Button btnChat;
@@ -27,7 +27,7 @@ public class HomeScreen extends AppCompatActivity {
         btnFriendsList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), UsersScreen.class);
+                Intent i = new Intent(getApplicationContext(), FriendsListActivity.class);
                 startActivity(i);
             }
         });
@@ -36,16 +36,7 @@ public class HomeScreen extends AppCompatActivity {
         btnProfileSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), ProfileSettingsScreen.class);
-                startActivity(i);
-            }
-        });
-
-        btnChat = (Button)findViewById(R.id.chatBtn);
-        btnChat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), ChatScreen.class);
+                Intent i = new Intent(getApplicationContext(), ProfileSettingsActivity.class);
                 startActivity(i);
             }
         });

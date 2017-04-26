@@ -8,7 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.pma.chat.pmaChat.R;
-import com.pma.chat.pmaChat.menu.HomeScreen;
+import com.pma.chat.pmaChat.menu.HomeActivity;
 
 /**
  * Created by Bojan on 4/23/2017.
@@ -30,7 +30,7 @@ public class LoginScreen extends Activity{
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), HomeScreen.class);
+                Intent i = new Intent(getApplicationContext(), HomeActivity.class);
                 startActivity(i);
             }
         });

@@ -5,7 +5,7 @@ import android.os.Bundle;
 
 import com.pma.chat.pmaChat.R;
 
-public class ProfileSettingsScreen extends AppCompatActivity {
+public class ProfileSettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
