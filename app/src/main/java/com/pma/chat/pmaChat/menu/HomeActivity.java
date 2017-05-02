@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.pma.chat.pmaChat.MainActivity;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.chat.ChatActivity;
 import com.pma.chat.pmaChat.users.ProfileSettingsActivity;
@@ -17,6 +18,7 @@ public class HomeActivity extends AppCompatActivity {
     Button btnChat;
     Button btnProfileSettings;
     Button btnExit;
+;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,8 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+
+
 
         btnExit = (Button)findViewById(R.id.exitBtn);
         btnExit.setOnClickListener(new View.OnClickListener() {
