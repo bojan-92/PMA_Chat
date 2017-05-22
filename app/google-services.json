@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "21313361914",
+    "firebase_url": "https://pma-chat-7677e.firebaseio.com",
+    "project_id": "pma-chat-7677e",
+    "storage_bucket": "pma-chat-7677e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:21313361914:android:91c6904b0ecb52c2",
+        "android_client_info": {
+          "package_name": "com.pma.chat.pma_chat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "21313361914-gjuf2dv9sh91jtj5orvfu8lf3as7es94.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pma.chat.pma_chat",
+            "certificate_hash": "b159911ae9b06a228cccbd7b0c9d858e604ec04c"
+          }
+        },
+        {
+          "client_id": "21313361914-kfiq855tqpvlj28raeevbrpjaikli955.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCd-b8ZLQj_FOn8nqTi2VJP9lCZ8eHyzM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "21313361914-kfiq855tqpvlj28raeevbrpjaikli955.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
