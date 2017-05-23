@@ -91,7 +91,7 @@ public class LoginScreen extends Activity{
                         progressDialog.dismiss();
                         if(task.isSuccessful()){
                             finish();
-                            startActivity(new Intent(getApplicationContext(),HomeActivity.class));
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
                         } else {
                             Toast.makeText(LoginScreen.this, "Login Failed", Toast.LENGTH_SHORT).show();
                         }
