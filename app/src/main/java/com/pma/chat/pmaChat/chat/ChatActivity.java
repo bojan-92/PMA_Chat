@@ -1,6 +1,5 @@
 package com.pma.chat.pmaChat.chat;
 
-import android.app.LauncherActivity.ListItem;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -17,7 +16,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.pma.chat.pmaChat.R;
 
 import java.util.ArrayList;
-import java.util.List;
+
 
 public class ChatActivity extends AppCompatActivity {
 

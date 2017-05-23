@@ -15,6 +15,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.pma.chat.pmaChat.MainActivity;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.model.User;
@@ -49,6 +51,8 @@ public class SignupScreen extends Activity {
 
     private FirebaseAuth firebaseAuth;
 
+    private DatabaseReference firebaseDb = FirebaseDatabase.getInstance().getReference();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -57,13 +61,14 @@ public class SignupScreen extends Activity {
 
         firebaseAuth = FirebaseAuth.getInstance();
 
+
         progressDialog = new ProgressDialog(this);
 
         btnDatePicker = (Button) findViewById(R.id.datePicker);
         dateSelected = (EditText) findViewById(R.id.dateSelected);
 
-     //   txtFirstName = (EditText) findViewById(R.id.dateSelected);
-     //   txtLastName = (EditText) findViewById(R.id.dateSelected);
+        txtFirstName = (EditText) findViewById(R.id.txtFirstName);
+        txtLastName = (EditText) findViewById(R.id.txtLastName);
         txtUsername = (EditText) findViewById(R.id.txtSignUpUsername);
         txtPassword = (EditText) findViewById(R.id.txtSignUpPassword);
 
@@ -87,13 +92,24 @@ public class SignupScreen extends Activity {
 
                 user = getFormData();
 
+
+
                 firebaseAuth.createUserWithEmailAndPassword(user.getUsername(), user.getPassword())
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 progressDialog.dismiss();
                                 if(task.isSuccessful()) {
+                                    String userId = firebaseAuth.getCurrentUser().getUid();
+                                    DatabaseReference  currentUserDb = firebaseDb.child(userId);
+
+                                    currentUserDb.child("userInfo").setValue(userInfo);
+
                                     Toast.makeText(SignupScreen.this, "Successful Registration", Toast.LENGTH_SHORT).show();
+
+
+
+
                                 } else {
                                     Toast.makeText(SignupScreen.this, "Registration Failed", Toast.LENGTH_SHORT).show();
                                 }
@@ -121,12 +137,13 @@ public class SignupScreen extends Activity {
     
     private User getFormData() {
         User user = new User();
-      //  user.setFirstName(txtFirstName.getText().toString().trim());
-      //  user.setLastName(txtLastName.getText().toString().trim());
+       user.setFirstName(txtFirstName.getText().toString().trim());
+       user.setLastName(txtLastName.getText().toString().trim());
         user.setUsername(txtUsername.getText().toString().trim());
         user.setPassword(txtPassword.getText().toString().trim());
       //  user.setBirthday(calendar);
         return user;
+
     }
 
 }

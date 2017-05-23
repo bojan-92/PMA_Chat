@@ -9,7 +9,7 @@
         android:inputType="text"
         android:hint="@string/firstName"
         android:ems="10"
-        android:id="@+id/editText2"
+        android:id="@+id/txtFirstName"
         android:layout_below="@+id/textView2"
         android:layout_alignParentStart="true"
         android:layout_marginTop="19dp" />
@@ -34,7 +34,7 @@
         android:ems="10"
         android:id="@+id/txtSignUpUsername"
         android:layout_marginTop="14dp"
-        android:layout_below="@+id/editText5"
+        android:layout_below="@+id/txtLastName"
         android:layout_alignParentStart="true" />
 
     <EditText
@@ -54,9 +54,9 @@
         android:inputType="text"
         android:hint="@string/lastName"
         android:ems="10"
-        android:id="@+id/editText5"
+        android:id="@+id/txtLastName"
         android:layout_marginTop="11dp"
-        android:layout_below="@+id/editText2"
+        android:layout_below="@+id/txtFirstName"
         android:layout_alignParentStart="true" />
 
     <EditText
@@ -79,7 +79,7 @@
         android:background="@color/colorAccent"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="12dp" />
+        />
 
     <Button
         android:layout_width="match_parent"
