@@ -5,7 +5,7 @@
     <string name="userTitle">USERS</string>
     <string name="userTitleFriendDetails">FRIEND DETAILS</string>
     <string name="login">Log in</string>
-    <string name="loginUsername">Username</string>
+    <string name="loginEmail">Email</string>
     <string name="loginPassword">Password</string>
     <string name="signUp">Sign up</string>
     <string name="firstName">First name</string>
