@@ -29,5 +29,6 @@
     <string name="chatMessageFieldPlaceholder">Type a message...</string>
     <string name="chatMessageSendText">Send</string>
     <string name="save">Save</string>
+    <string name="selectedDateOfBirth">Date of birth</string>
 
 </resources>

@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -21,6 +22,7 @@ import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.model.UserInfo;
 
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by Bojan on 4/24/2017.
@@ -44,7 +46,7 @@ public class SignupScreen extends Activity {
 
     private Button btnDatePicker;
 
-    private EditText dateSelected;
+    private EditText txtSelectedDateOfBirth;
 
     private Button btnSignUp;
 
@@ -65,20 +67,24 @@ public class SignupScreen extends Activity {
         progressDialog = new ProgressDialog(this);
 
         btnDatePicker = (Button) findViewById(R.id.datePicker);
-        dateSelected = (EditText) findViewById(R.id.dateSelected);
+        txtSelectedDateOfBirth = (EditText) findViewById(R.id.txtSelectedDateOfBirth);
+        txtSelectedDateOfBirth.setEnabled(false);
 
         txtFirstName = (EditText) findViewById(R.id.txtFirstName);
         txtLastName = (EditText) findViewById(R.id.txtLastName);
         txtUsername = (EditText) findViewById(R.id.txtSignUpEmail);
         txtPassword = (EditText) findViewById(R.id.txtSignUpPassword);
+
         txtPasswordConfirm = (EditText) findViewById(R.id.txtSignUpPasswordConfirm);
 
         btnDatePicker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new DatePickerDialog(SignupScreen.this, date, calendar.get(Calendar.YEAR),
+                DatePickerDialog dpd = new DatePickerDialog(SignupScreen.this, date, calendar.get(Calendar.YEAR),
                         calendar.get(Calendar.MONTH),
-                        calendar.get(Calendar.DAY_OF_MONTH)).show();
+                        calendar.get(Calendar.DAY_OF_MONTH));
+                dpd.getDatePicker().setMaxDate(System.currentTimeMillis());
+                dpd.show();
             }
         });
 
@@ -130,16 +136,19 @@ public class SignupScreen extends Activity {
 
     }
 
+
     DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
 
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear,
                               int dayOfMonth) {
             // TODO Auto-generated method stub
+            view.setMaxDate(System.currentTimeMillis());
             calendar.set(Calendar.YEAR, year);
             calendar.set(Calendar.MONTH, monthOfYear);
             calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-            //    dateSelected.setText(dayOfMonth + '/' + monthOfYear + '/' + year);
+            txtSelectedDateOfBirth.setText(String.valueOf(dayOfMonth) + "/" + String.valueOf(monthOfYear) + "/" + String.valueOf(year));
+            txtSelectedDateOfBirth.setGravity(Gravity.CENTER_HORIZONTAL);
         }
     };
 
