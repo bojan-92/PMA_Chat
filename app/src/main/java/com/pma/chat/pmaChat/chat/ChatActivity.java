@@ -8,12 +8,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.pma.chat.pmaChat.R;
+import com.pma.chat.pmaChat.model.Message;
 
 import java.util.ArrayList;
 
@@ -23,6 +25,8 @@ public class ChatActivity extends AppCompatActivity {
     private EditText txtMessage;
 
     private Button btnSendMessage;
+
+    private FirebaseAuth firebaseAuth;
 
     DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
 
@@ -34,21 +38,25 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.chat_screen);
     }
 
+    @Override
     protected void onStart() {
 
         super.onStart();
+
+        firebaseAuth = FirebaseAuth.getInstance();
 
         txtMessage = (EditText) findViewById(R.id.chatMessageField);
         btnSendMessage = (Button) findViewById(R.id.chatMessageSendBtn);
 
         messageRef.addValueEventListener(new ValueEventListener() {
+
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 ArrayList<String> messages = new ArrayList<>();
 
                 for(DataSnapshot data : dataSnapshot.getChildren()) {
-                    messages.add(data.getValue(String.class));
+                    messages.add(data.getValue(Message.class).getContent());
                 }
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(
@@ -74,7 +82,9 @@ public class ChatActivity extends AppCompatActivity {
 
                 String id = messageRef.push().getKey();
 
-                String message = txtMessage.getText().toString();
+                String messageContent = txtMessage.getText().toString();
+
+                Message message = new Message(messageContent, firebaseAuth.getCurrentUser().getUid(), null);
 
                 messageRef.child(id).setValue(message);
             }

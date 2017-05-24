@@ -4,13 +4,24 @@
     <string name="userOpt">CHAT SETTINGS CONTACT</string>
     <string name="userTitle">USERS</string>
     <string name="userTitleFriendDetails">FRIEND DETAILS</string>
-    <string name="login">Log in</string>
+    <string name="login">Login</string>
+    <string name="loginHeader">PMA Chat Login</string>
+    <string name="logout">Logout</string>
     <string name="loginEmail">Email</string>
     <string name="loginPassword">Password</string>
-    <string name="signUp">Sign up</string>
+    <string name="emailFieldEmptyMessage">Email is empty!</string>
+    <string name="passwordFieldEmptyMessage">Password is empty!</string>
+    <string name="passwordConfirmFieldEmptyMessage">Password is empty!</string>
+    <string name="firstNameFieldEmptyMessage">First Name is empty!</string>
+    <string name="lastNameFieldEmptyMessage">Last Name is empty!</string>
+    <string name="loginFailedMessage">Login Failed!</string>
+    <string name="loginGoToSignUp">Don\'t have an account? Sign Up here</string>
+    <string name="signUp">Sign Up</string>
+    <string name="signUpHeader">Sign Up on PMA Chat</string>
     <string name="firstName">First name</string>
     <string name="lastName">Last name</string>
     <string name="confirmPassword">Password confirm</string>
+    <string name="signUpGoBackToLogin">Back to Login</string>
     <string name="birthdayLabel">Birthday</string>
     <string name="date_selected"></string>
     <string name="userStartChat">START CHAT</string>
@@ -26,9 +37,14 @@
     <string name="chat">Chat</string>
     <string name="profileSettings">Profile Settings</string>
     <string name="exit">Exit</string>
-    <string name="chatMessageFieldPlaceholder">Type a message...</string>
+    <string name="chatMessageFieldPlaceholder">Type a message ...</string>
     <string name="chatMessageSendText">Send</string>
     <string name="save">Save</string>
     <string name="selectedDateOfBirth">Date of birth</string>
+    <string name="successfulRegistrationMessage">Successful Registration! You can login now</string>
+    <string name="failedRegistrationMessage">Registration Failed!</string>
+    <string name="passwordAndConfirmationDoNotMatchMessage">Password and Password Confirm do not match!</string>
+    <string name="registeringUserMessage">Registering User ...</string>
+
 
 </resources>

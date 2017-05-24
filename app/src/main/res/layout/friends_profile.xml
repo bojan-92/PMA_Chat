@@ -1,37 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/usersTop"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:paddingTop="20dp"
         android:background="@color/colorAccent"
+        android:contextClickable="true"
+        android:paddingTop="20dp"
         android:text="@string/userTitle"
         android:textAlignment="center"
-        android:contextClickable="true"
-        android:textColor="#FFF"/>
+        android:textColor="#FFF" />
 
     <ImageView
         android:id="@+id/imageViewProfile"
         android:layout_width="match_parent"
         android:layout_height="220dp"
-        android:background="@color/colorPrimaryDark"
-        android:src="@drawable/friend_details"
+        android:layout_alignParentStart="true"
         android:layout_below="@+id/usersTop"
-        android:layout_alignParentStart="true" />
+        android:background="@color/colorPrimaryDark"
+        android:src="@drawable/friend_details" />
 
     <TextView
         android:id="@+id/usersDetailsFullName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:contextClickable="true"
-        android:paddingTop="30dp"
         android:layout_alignEnd="@+id/imageViewProfile"
         android:layout_below="@+id/imageViewProfile"
+        android:contextClickable="true"
+        android:paddingTop="30dp"
         android:text="@string/userFullName"
         android:textAlignment="center" />
 
@@ -39,10 +38,10 @@
         android:id="@+id/usersDetailsBirthday"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:contextClickable="true"
-        android:paddingTop="30dp"
         android:layout_alignEnd="@+id/usersDetailsFullName"
         android:layout_below="@+id/usersDetailsFullName"
+        android:contextClickable="true"
+        android:paddingTop="30dp"
         android:text="@string/userBirth"
         android:textAlignment="center" />
 
@@ -50,13 +49,12 @@
         android:id="@+id/chatButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
         android:background="@color/colorAccent"
         android:text="@string/userStartChat"
         android:textAlignment="center"
-        android:textColor="#FFF"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-      />
+        android:textColor="#FFF" />
 
 
 </RelativeLayout>

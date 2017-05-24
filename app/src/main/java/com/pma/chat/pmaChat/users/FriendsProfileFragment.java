@@ -11,18 +11,17 @@ import android.widget.Button;
 
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.chat.ChatActivity;
-import com.pma.chat.pmaChat.menu.HomeActivity;
-
-import static android.R.attr.button;
 
 /**
  * Created by david on 4/29/17.
  */
 
-public class FragmentThree extends Fragment{
+public class FriendsProfileFragment extends Fragment {
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.friends_profile, container, false);
         Button btnChat = (Button) view.findViewById(R.id.chatButton);
         btnChat.setOnClickListener(new View.OnClickListener() {
@@ -33,7 +32,6 @@ public class FragmentThree extends Fragment{
             }
         });
         return view;
-
 
     }
 

@@ -3,13 +3,16 @@ package com.pma.chat.pmaChat.auth;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -18,11 +21,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.pma.chat.pmaChat.MainActivity;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.model.UserInfo;
 
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Created by Bojan on 4/24/2017.
@@ -38,7 +41,7 @@ public class SignupScreen extends Activity {
 
     private EditText txtLastName;
 
-    private EditText txtUsername;
+    private EditText txtEmail;
 
     private EditText txtPassword;
 
@@ -49,6 +52,8 @@ public class SignupScreen extends Activity {
     private EditText txtSelectedDateOfBirth;
 
     private Button btnSignUp;
+
+    private TextView tvGoToLogin;
 
     private ProgressDialog progressDialog;
 
@@ -61,21 +66,41 @@ public class SignupScreen extends Activity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signup_screen);
+    }
+
+    @Override
+    protected void onStart() {
+
+        super.onStart();
 
         firebaseAuth = FirebaseAuth.getInstance();
 
+        if(firebaseAuth.getCurrentUser() != null){
+            finish();
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        }
+
         progressDialog = new ProgressDialog(this);
+
+        txtFirstName = (EditText) findViewById(R.id.txtFirstName);
+        txtLastName = (EditText) findViewById(R.id.txtLastName);
+        txtEmail = (EditText) findViewById(R.id.txtSignUpEmail);
+        txtPassword = (EditText) findViewById(R.id.txtSignUpPassword);
+        txtPasswordConfirm = (EditText) findViewById(R.id.txtSignUpPasswordConfirm);
 
         btnDatePicker = (Button) findViewById(R.id.datePicker);
         txtSelectedDateOfBirth = (EditText) findViewById(R.id.txtSelectedDateOfBirth);
         txtSelectedDateOfBirth.setEnabled(false);
 
-        txtFirstName = (EditText) findViewById(R.id.txtFirstName);
-        txtLastName = (EditText) findViewById(R.id.txtLastName);
-        txtUsername = (EditText) findViewById(R.id.txtSignUpEmail);
-        txtPassword = (EditText) findViewById(R.id.txtSignUpPassword);
+        tvGoToLogin = (TextView) findViewById(R.id.tvSignUpBackToLogin);
 
-        txtPasswordConfirm = (EditText) findViewById(R.id.txtSignUpPasswordConfirm);
+        tvGoToLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), LoginScreen.class);
+                startActivity(i);
+            }
+        });
 
         btnDatePicker.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,20 +119,28 @@ public class SignupScreen extends Activity {
             @Override
             public void onClick(View view) {
 
-                if (!txtPassword.getText().toString().equals(txtPasswordConfirm.getText().toString())) {
-                    Toast.makeText(SignupScreen.this, "Password and Password Confirm do not match!", Toast.LENGTH_SHORT).show();
+                String email = txtEmail.getText().toString().trim();
+                String password = txtPassword.getText().toString().trim();
+                String passwordConfirm = txtPasswordConfirm.getText().toString().trim();
+                String firstName = txtFirstName.getText().toString().trim();
+                String lastName = txtLastName.getText().toString().trim();
+
+                if(!isFormValid(email, password, passwordConfirm, firstName, lastName)) {
                     return;
                 }
 
+                if (!password.equals(passwordConfirm)) {
+                    Toast.makeText(SignupScreen.this, R.string.passwordAndConfirmationDoNotMatchMessage, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // TODO find out how to pass resource id
                 progressDialog.setMessage("Registering User ...");
                 progressDialog.show();
 
-                final String username = txtUsername.getText().toString();
-                final String password = txtPassword.getText().toString();
+                userInfo = new UserInfo(firstName, lastName, calendar);
 
-                userInfo = getFormData();
-
-                firebaseAuth.createUserWithEmailAndPassword(username, password)
+                firebaseAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
 
                             @Override
@@ -122,20 +155,18 @@ public class SignupScreen extends Activity {
 
                                     currentUserRef.setValue(userInfo);
 
-                                    Toast.makeText(SignupScreen.this, "Successful Registration", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(SignupScreen.this, R.string.successfulRegistrationMessage, Toast.LENGTH_SHORT).show();
 
+                                    firebaseAuth.signOut();
                                 } else {
-                                    Toast.makeText(SignupScreen.this, "Registration Failed", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(SignupScreen.this, R.string.failedRegistrationMessage, Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
-
-
             }
         });
 
     }
-
 
     DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
 
@@ -152,13 +183,28 @@ public class SignupScreen extends Activity {
         }
     };
 
-    private UserInfo getFormData() {
-        UserInfo userInfo = new UserInfo();
-        userInfo.setFirstName(txtFirstName.getText().toString().trim());
-        userInfo.setLastName(txtLastName.getText().toString().trim());
-        //  userInfo.setBirthday(calendar);
-        return userInfo;
-
+    private boolean isFormValid(String email, String password, String passwordConfirm, String firstName, String lastName) {
+        if (TextUtils.isEmpty(email)) {
+            Toast.makeText(SignupScreen.this, R.string.emailFieldEmptyMessage, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (TextUtils.isEmpty(password)) {
+            Toast.makeText(SignupScreen.this, R.string.passwordFieldEmptyMessage, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (TextUtils.isEmpty(passwordConfirm)) {
+            Toast.makeText(SignupScreen.this, R.string.passwordConfirmFieldEmptyMessage, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (TextUtils.isEmpty(firstName)) {
+            Toast.makeText(SignupScreen.this, R.string.firstNameFieldEmptyMessage, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (TextUtils.isEmpty(lastName)) {
+            Toast.makeText(SignupScreen.this, R.string.lastNameFieldEmptyMessage, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
     }
 
 }
