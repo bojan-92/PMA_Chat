@@ -47,6 +47,8 @@
     <string name="failedRegistrationMessage">Registration Failed!</string>
     <string name="passwordAndConfirmationDoNotMatchMessage">Password and Password Confirm do not match!</string>
     <string name="registeringUserMessage">Registering User ...</string>
+    <string name="failedSavingUserInfoMessage">Saving user info failed!</string>
+
 
 
 </resources>

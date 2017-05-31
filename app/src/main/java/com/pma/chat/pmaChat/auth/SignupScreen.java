@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.pma.chat.pmaChat.MainActivity;
@@ -158,11 +159,19 @@ public class SignupScreen extends Activity {
                                     String userId = firebaseAuth.getCurrentUser().getUid();
                                     DatabaseReference currentUserRef = firebaseDatabaseRef.child("userInfo").child(userId);
 
-                                    currentUserRef.setValue(userInfo);
+                                    currentUserRef.setValue(userInfo, new DatabaseReference.CompletionListener() {
+                                        @Override
+                                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                            if (databaseError != null) {
+                                                Toast.makeText(SignupScreen.this, R.string.failedSavingUserInfoMessage, Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                firebaseAuth.signOut();
+                                            }
+                                        }
+                                    });
 
                                     Toast.makeText(SignupScreen.this, R.string.successfulRegistrationMessage, Toast.LENGTH_SHORT).show();
 
-//                                    firebaseAuth.signOut();
                                 } else {
                                     Toast.makeText(SignupScreen.this, R.string.failedRegistrationMessage, Toast.LENGTH_SHORT).show();
                                 }
