@@ -95,13 +95,23 @@
         android:hint="@string/selectedDateOfBirth"
         android:inputType="date" />
 
+    <EditText
+        android:id="@+id/txtPhoneNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/txtSelectedDateOfBirth"
+        android:ems="10"
+        android:inputType="phone" />
+
     <Button
         android:id="@+id/btnSignUp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/txtSelectedDateOfBirth"
+        android:layout_below="@+id/txtPhoneNumber"
         android:background="@color/colorAccent"
         android:text="@string/signUp"
+        android:layout_alignParentStart="true"
         android:textColor="#FFF" />
 
     <TextView

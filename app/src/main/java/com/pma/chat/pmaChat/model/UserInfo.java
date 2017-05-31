@@ -9,14 +9,17 @@ public class UserInfo {
 
     private String lastName;
 
+    private String phoneNumber;
+
   //  private Calendar birthday;
 
     public UserInfo() {
     }
 
-    public UserInfo(String firstName, String lastName, Calendar birthday) {
+    public UserInfo(String firstName, String lastName, String phoneNumber, Calendar birthday) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
     //    this.birthday = birthday;
     }
 
@@ -35,7 +38,16 @@ public class UserInfo {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
-/*
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    /*
     public Calendar getBirthday() {
         return birthday;
     }

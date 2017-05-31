@@ -45,6 +45,8 @@ public class SignupScreen extends Activity {
 
     private EditText txtPassword;
 
+    private EditText txtPhoneNumber;
+
     private EditText txtPasswordConfirm;
 
     private Button btnDatePicker;
@@ -87,10 +89,12 @@ public class SignupScreen extends Activity {
         txtEmail = (EditText) findViewById(R.id.txtSignUpEmail);
         txtPassword = (EditText) findViewById(R.id.txtSignUpPassword);
         txtPasswordConfirm = (EditText) findViewById(R.id.txtSignUpPasswordConfirm);
+        txtPhoneNumber = (EditText) findViewById(R.id.txtPhoneNumber);
 
         btnDatePicker = (Button) findViewById(R.id.datePicker);
         txtSelectedDateOfBirth = (EditText) findViewById(R.id.txtSelectedDateOfBirth);
         txtSelectedDateOfBirth.setEnabled(false);
+
 
         tvGoToLogin = (TextView) findViewById(R.id.tvSignUpBackToLogin);
 
@@ -124,8 +128,9 @@ public class SignupScreen extends Activity {
                 String passwordConfirm = txtPasswordConfirm.getText().toString().trim();
                 String firstName = txtFirstName.getText().toString().trim();
                 String lastName = txtLastName.getText().toString().trim();
+                String phoneNumber = txtPhoneNumber.getText().toString().trim();
 
-                if(!isFormValid(email, password, passwordConfirm, firstName, lastName)) {
+                if(!isFormValid(email, password, passwordConfirm, firstName, lastName, phoneNumber)) {
                     return;
                 }
 
@@ -138,7 +143,7 @@ public class SignupScreen extends Activity {
                 progressDialog.setMessage("Registering User ...");
                 progressDialog.show();
 
-                userInfo = new UserInfo(firstName, lastName, calendar);
+                userInfo = new UserInfo(firstName, lastName, phoneNumber, calendar);
 
                 firebaseAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -157,7 +162,7 @@ public class SignupScreen extends Activity {
 
                                     Toast.makeText(SignupScreen.this, R.string.successfulRegistrationMessage, Toast.LENGTH_SHORT).show();
 
-                                    firebaseAuth.signOut();
+//                                    firebaseAuth.signOut();
                                 } else {
                                     Toast.makeText(SignupScreen.this, R.string.failedRegistrationMessage, Toast.LENGTH_SHORT).show();
                                 }
@@ -183,7 +188,7 @@ public class SignupScreen extends Activity {
         }
     };
 
-    private boolean isFormValid(String email, String password, String passwordConfirm, String firstName, String lastName) {
+    private boolean isFormValid(String email, String password, String passwordConfirm, String firstName, String lastName, String phoneNumber) {
         if (TextUtils.isEmpty(email)) {
             Toast.makeText(SignupScreen.this, R.string.emailFieldEmptyMessage, Toast.LENGTH_SHORT).show();
             return false;
@@ -201,6 +206,10 @@ public class SignupScreen extends Activity {
             return false;
         }
         if (TextUtils.isEmpty(lastName)) {
+            Toast.makeText(SignupScreen.this, R.string.lastNameFieldEmptyMessage, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (TextUtils.isEmpty(phoneNumber)) {
             Toast.makeText(SignupScreen.this, R.string.lastNameFieldEmptyMessage, Toast.LENGTH_SHORT).show();
             return false;
         }
