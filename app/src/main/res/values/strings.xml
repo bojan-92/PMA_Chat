@@ -34,6 +34,8 @@
     <string name="userEdit">EDIT</string>
     <string name="userTitleEdit">EDIT PROFILE</string>
     <string name="friendsList">Friends List</string>
+    <string name="friends_profile">Friends profile</string>
+    <string name="edit_profile_settings">Edit profile settings</string>
     <string name="chat">Chat</string>
     <string name="profileSettings">Profile Settings</string>
     <string name="exit">Exit</string>
