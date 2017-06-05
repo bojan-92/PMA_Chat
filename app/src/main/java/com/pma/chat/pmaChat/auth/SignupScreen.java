@@ -219,7 +219,7 @@ public class SignupScreen extends Activity {
             return false;
         }
         if (TextUtils.isEmpty(phoneNumber)) {
-            Toast.makeText(SignupScreen.this, R.string.lastNameFieldEmptyMessage, Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupScreen.this, R.string.phoneNumberFieldEmptyMessage, Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
