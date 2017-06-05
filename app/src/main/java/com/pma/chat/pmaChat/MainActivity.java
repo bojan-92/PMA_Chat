@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         mDrawerHeaderEmail = (TextView) listHeaderView.findViewById(R.id.drawer_header_email);
 
         // TODO dodelish vrednosti ovim treju varijablama, npr. mDrawerHeaderUsername.setText("David Milivojev")
-        mDrawerHeaderUsername.setText("David Milivojev");
+        mDrawerHeaderUsername.setText(firebaseAuth.getCurrentUser().getEmail());
 
         listView.addHeaderView(listHeaderView);
     }
