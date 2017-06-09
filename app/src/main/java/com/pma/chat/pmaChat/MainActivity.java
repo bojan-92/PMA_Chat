@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -22,30 +23,25 @@ import com.pma.chat.pmaChat.users.FriendsListFragment;
 import com.pma.chat.pmaChat.users.FriendsProfileFragment;
 import com.pma.chat.pmaChat.users.ProfileSettingsFragment;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ListView listView;
-
-    private DrawerListAdapter listAdapter;
-
+    private ListView mListView;
     private List<NavItem> mNavItems = new ArrayList<NavItem>();
 
-    private DrawerLayout drawerLayout;
-
-    private FirebaseAuth firebaseAuth;
-
+    private DrawerLayout mDrawerLayout;
+    private DrawerListAdapter mListAdapter;
     // Drawer header Views
-
     private ImageView mDrawerHeaderAvatar;
-
     private TextView mDrawerHeaderUsername;
-
     private TextView mDrawerHeaderEmail;
+
+    private ImageButton mPhotoPickerButton;
+
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseAuth.AuthStateListener mAuthStateListener;
 
 
     @Override
@@ -56,22 +52,22 @@ public class MainActivity extends AppCompatActivity {
 
         initDrawerListItems(mNavItems);
 
-        firebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseAuth = FirebaseAuth.getInstance();
 
-        if(firebaseAuth.getCurrentUser() == null){
+        if(mFirebaseAuth.getCurrentUser() == null){
             finish();
             startActivity(new Intent(getApplicationContext(), LoginScreen.class));
         }
 
-        listView = (ListView) findViewById(R.id.listview);
+        mListView = (ListView) findViewById(R.id.listview);
 
         initDrawerListHeader();
 
-        listAdapter = new DrawerListAdapter(this, mNavItems);
-        listView.setAdapter(listAdapter);
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        mListAdapter = new DrawerListAdapter(this, mNavItems);
+        mListView.setAdapter(mListAdapter);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Fragment fragment;
@@ -87,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                         fragment = new FriendsProfileFragment();
                         break;
                     case 4:
-                        firebaseAuth.signOut();
+                        mFirebaseAuth.signOut();
                         Intent i = new Intent(MainActivity.this.getApplicationContext(), LoginScreen.class);
                         startActivity(i);
                         return;
@@ -97,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 fragmentManager.beginTransaction().replace(R.id.relativeLayout, fragment).commit();
-                drawerLayout.closeDrawers();
+                mDrawerLayout.closeDrawers();
             }
         });
 
@@ -117,9 +113,9 @@ public class MainActivity extends AppCompatActivity {
         mDrawerHeaderEmail = (TextView) listHeaderView.findViewById(R.id.drawer_header_email);
 
         // TODO dodelish vrednosti ovim treju varijablama, npr. mDrawerHeaderUsername.setText("David Milivojev")
-        mDrawerHeaderUsername.setText(firebaseAuth.getCurrentUser().getEmail());
+        mDrawerHeaderUsername.setText(mFirebaseAuth.getCurrentUser().getEmail());
 
-        listView.addHeaderView(listHeaderView);
+        mListView.addHeaderView(listHeaderView);
     }
 
     /**

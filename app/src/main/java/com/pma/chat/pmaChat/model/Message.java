@@ -6,6 +6,8 @@ package com.pma.chat.pmaChat.model;
 
 public class Message {
 
+    private MessageType type;
+
     private String content;
 
     private String senderId;
@@ -15,7 +17,8 @@ public class Message {
     public Message() {
     }
 
-    public Message(String content, String senderId, String receiverId) {
+    public Message(MessageType type, String content, String senderId, String receiverId) {
+        this.type = type;
         this.content = content;
         this.senderId = senderId;
         this.receiverId = receiverId;
@@ -43,5 +46,13 @@ public class Message {
 
     public void setReceiverId(String receiverId) {
         this.receiverId = receiverId;
+    }
+
+    public MessageType getType() {
+        return type;
+    }
+
+    public void setType(MessageType type) {
+        this.type = type;
     }
 }

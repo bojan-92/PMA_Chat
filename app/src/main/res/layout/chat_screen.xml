@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <ListView
         android:id="@+id/chatMessagesList"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/chatMessagesTextMessageContainer" />
 
     <LinearLayout
-        android:id="@+id/ll_send_message"
+        android:id="@+id/chatMessagesTextMessageContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal" >
+        android:layout_above="@+id/chatMessagesNoTextMessageTypesContainer"
+        android:orientation="horizontal">
 
         <EditText
             android:id="@+id/chatMessageField"
@@ -22,11 +24,11 @@
             android:layout_gravity="center_vertical|center_horizontal"
             android:layout_weight="5"
             android:gravity="top|left"
+            android:hint="@string/chatMessageFieldPlaceholder"
             android:inputType="textMultiLine|textCapSentences"
             android:maxLines="5"
             android:minLines="3"
-            android:scrollHorizontally="false"
-            android:hint="@string/chatMessageFieldPlaceholder"/>
+            android:scrollHorizontally="false" />
 
         <Button
             android:id="@+id/chatMessageSendBtn"
@@ -37,5 +39,27 @@
             android:text="@string/chatMessageSendText"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/chatMessagesNoTextMessageTypesContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/photoPickerButton"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@android:drawable/ic_menu_gallery" />
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/chatMessagesProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" />
 
 </RelativeLayout>

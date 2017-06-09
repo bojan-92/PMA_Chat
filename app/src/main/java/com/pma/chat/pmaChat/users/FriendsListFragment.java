@@ -12,8 +12,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,7 +21,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.chat.ChatActivity;
-import com.pma.chat.pmaChat.model.Message;
 import com.pma.chat.pmaChat.model.UserInfo;
 
 import java.util.ArrayList;
@@ -32,12 +31,10 @@ import java.util.ArrayList;
 
 public class FriendsListFragment extends Fragment {
 
-    DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+    DatabaseReference mRootDatabaseReference = FirebaseDatabase.getInstance().getReference();
+    DatabaseReference mUserInfoDatabaseReference = mRootDatabaseReference.child("userInfo");
 
-    DatabaseReference userInfoRef = rootRef.child("userInfo");
-
-    ProgressDialog progressDialog;
-
+    ProgressBar mProgressBar;
 
     @Nullable
     @Override
@@ -47,15 +44,14 @@ public class FriendsListFragment extends Fragment {
 
         final View view = inflater.inflate(R.layout.users_list, container, false);
 
-        progressDialog = new ProgressDialog(this.getActivity());
+        mProgressBar = (ProgressBar) view.findViewById(R.id.usersListProgressBar);
+        mProgressBar.setVisibility(ProgressBar.INVISIBLE);
 
-        userInfoRef.addValueEventListener(new ValueEventListener() {
+        mUserInfoDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                // TODO find out how to pass resource id
-                progressDialog.setMessage("Loading Friends");
-                progressDialog.show();
+                mProgressBar.setVisibility(ProgressBar.VISIBLE);
 
                 ArrayList<String> users = new ArrayList<>();
 
@@ -80,7 +76,7 @@ public class FriendsListFragment extends Fragment {
                     }
                 });
 
-                progressDialog.hide();
+                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
 
             }
 
