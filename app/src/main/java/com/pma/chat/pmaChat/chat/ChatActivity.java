@@ -1,17 +1,24 @@
 package com.pma.chat.pmaChat.chat;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -33,7 +40,12 @@ import com.pma.chat.pmaChat.auth.LoginScreen;
 import com.pma.chat.pmaChat.model.Message;
 import com.pma.chat.pmaChat.model.MessageType;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -44,6 +56,8 @@ public class ChatActivity extends AppCompatActivity {
     private EditText mMessageEditText;
     private Button mSendMessageButton;
     private ListView mMessagesListView;
+    private Button mCameraButton;
+    private ImageView mCameraView;
 
     private ImageButton mPhotoPickerButton;
 
@@ -60,9 +74,15 @@ public class ChatActivity extends AppCompatActivity {
     private DatabaseReference mMessagesDatabaseReference = mRootDatabaseReference.child("message");
     private ChildEventListener mChildEventListener;
 
+    private Uri mCurrentPhotoPath;
+
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
 
     private static final int RC_PHOTO_PICKER = 2;
+
+    private static final int RC_PHOTO_CAPTURE = 3;
+
+   // private static final int CAN_REQUEST=1313;
 
 
     @Override
@@ -81,6 +101,7 @@ public class ChatActivity extends AppCompatActivity {
         mSendMessageButton = (Button) findViewById(R.id.chatMessageSendBtn);
         mMessagesListView = (ListView) findViewById(R.id.chatMessagesList);
         mPhotoPickerButton = (ImageButton) findViewById(R.id.photoPickerButton);
+        mCameraButton = (Button) findViewById(R.id.btnCamera);
 
         // Initialize message ListView and its adapter
         List<Message> messages = new ArrayList<>();
@@ -134,6 +155,16 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+        mCameraButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dispatchTakePictureIntent();
+            }
+
+        });
+
+
+
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -149,11 +180,35 @@ public class ChatActivity extends AppCompatActivity {
                 }
             }
         };
+
+
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_PHOTO_CAPTURE && resultCode == RESULT_OK) {
+
+            Uri capturedImageUri = mCurrentPhotoPath;
+
+            // Get a reference to store file at chat_photos/<FILENAME>
+            StorageReference photoRef = mChatPhotosStorageReference.child(capturedImageUri.getLastPathSegment());
+
+            // Upload file to Firebase Storage
+            photoRef.putFile(capturedImageUri)
+                    .addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // When the image has successfully uploaded, we get its download URL
+                            @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
+
+                            // Set the download URL to the message box, so that the user can send it to the database
+                            Message message = new Message(MessageType.PHOTO, downloadUrl.toString(), mFirebaseAuth.getCurrentUser().getUid(), null);
+                            mMessagesDatabaseReference.push().setValue(message);
+                        }
+                    });
+        }
+
 
         if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
             Uri selectedImageUri = data.getData();
@@ -175,6 +230,14 @@ public class ChatActivity extends AppCompatActivity {
                     });
         }
     }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
 
     @Override
     protected void onResume() {
@@ -231,6 +294,45 @@ public class ChatActivity extends AppCompatActivity {
             mMessagesDatabaseReference.removeEventListener(mChildEventListener);
             mChildEventListener = null;
         }
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.pma.chat.pmaChat.fileprovider",
+                        photoFile);
+                mCurrentPhotoPath = photoURI;
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, RC_PHOTO_CAPTURE);
+            }
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        return image;
     }
 
 }

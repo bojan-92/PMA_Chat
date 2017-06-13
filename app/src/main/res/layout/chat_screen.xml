@@ -53,6 +53,15 @@
             android:layout_height="36dp"
             android:background="@android:drawable/ic_menu_gallery" />
 
+        <Button
+            android:id="@+id/btnCamera"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:textColor="#FFF"
+            android:text="Open Camera"/>
+
     </LinearLayout>
 
     <ProgressBar
