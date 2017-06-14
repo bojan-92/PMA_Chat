@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.pma.chat.pmaChat.adapters.DrawerListAdapter;
 import com.pma.chat.pmaChat.auth.LoginScreen;
 import com.pma.chat.pmaChat.model.NavItem;
+import com.pma.chat.pmaChat.providers.DatabaseHelper;
 import com.pma.chat.pmaChat.users.FriendsListFragment;
 import com.pma.chat.pmaChat.users.FriendsProfileFragment;
 import com.pma.chat.pmaChat.users.ProfileSettingsFragment;
@@ -49,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        DatabaseHelper db = new DatabaseHelper(getApplicationContext());
 
         initDrawerListItems(mNavItems);
 
