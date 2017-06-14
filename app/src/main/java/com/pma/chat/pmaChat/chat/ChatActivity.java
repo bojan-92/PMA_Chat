@@ -58,6 +58,7 @@ public class ChatActivity extends AppCompatActivity {
     private ListView mMessagesListView;
     private Button mCameraButton;
     private ImageView mCameraView;
+    private Button mCameraVideoButton;
 
     private ImageButton mPhotoPickerButton;
 
@@ -76,11 +77,15 @@ public class ChatActivity extends AppCompatActivity {
 
     private Uri mCurrentPhotoPath;
 
+    private Uri mCurrentVideoPath;
+
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
 
     private static final int RC_PHOTO_PICKER = 2;
 
     private static final int RC_PHOTO_CAPTURE = 3;
+
+    private static final int RC_VIDEO_CAPTURE = 4;
 
    // private static final int CAN_REQUEST=1313;
 
@@ -102,6 +107,7 @@ public class ChatActivity extends AppCompatActivity {
         mMessagesListView = (ListView) findViewById(R.id.chatMessagesList);
         mPhotoPickerButton = (ImageButton) findViewById(R.id.photoPickerButton);
         mCameraButton = (Button) findViewById(R.id.btnCamera);
+        mCameraVideoButton = (Button) findViewById(R.id.btnCameraVideo);
 
         // Initialize message ListView and its adapter
         List<Message> messages = new ArrayList<>();
@@ -163,6 +169,15 @@ public class ChatActivity extends AppCompatActivity {
 
         });
 
+        mCameraVideoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dispatchTakeVideoIntent();
+            }
+
+        });
+
+
 
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
@@ -209,6 +224,27 @@ public class ChatActivity extends AppCompatActivity {
                     });
         }
 
+        if (requestCode == RC_VIDEO_CAPTURE && resultCode == RESULT_OK) {
+
+            Uri capturedVideoUri = mCurrentVideoPath;
+
+            // Get a reference to store file at chat_photos/<FILENAME>
+            StorageReference videoRef = mChatPhotosStorageReference.child(capturedVideoUri.getLastPathSegment());
+
+            // Upload file to Firebase Storage
+            videoRef.putFile(capturedVideoUri)
+                    .addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // When the image has successfully uploaded, we get its download URL
+                            @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
+
+                            // Set the download URL to the message box, so that the user can send it to the database
+                            Message message = new Message(MessageType.VIDEO, downloadUrl.toString(), mFirebaseAuth.getCurrentUser().getUid(), null);
+                            mMessagesDatabaseReference.push().setValue(message);
+                        }
+                    });
+        }
+
 
         if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
             Uri selectedImageUri = data.getData();
@@ -237,6 +273,8 @@ public class ChatActivity extends AppCompatActivity {
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
         return Uri.parse(path);
     }
+
+
 
 
     @Override
@@ -320,6 +358,8 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+
+
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -333,6 +373,46 @@ public class ChatActivity extends AppCompatActivity {
 
         // Save a file: path for use with ACTION_VIEW intents
         return image;
+    }
+
+    private void dispatchTakeVideoIntent() {
+        Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File videoFile = null;
+            try {
+                videoFile = createVideoFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+
+            }
+            // Continue only if the File was successfully created
+            if (videoFile != null) {
+                Uri videoURI = FileProvider.getUriForFile(this,
+                        "com.pma.chat.pmaChat.fileprovider",
+                        videoFile);
+                mCurrentVideoPath = videoURI;
+                takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoURI);
+                startActivityForResult(takeVideoIntent, RC_VIDEO_CAPTURE);
+            }
+        }
+    }
+
+
+    private File createVideoFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String videoFileName = "MP4_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File video = File.createTempFile(
+                videoFileName,  /* prefix */
+                ".mp4",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        return video;
     }
 
 }

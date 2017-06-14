@@ -45,7 +45,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:weightSum="1">
 
         <ImageButton
             android:id="@+id/photoPickerButton"
@@ -55,12 +56,20 @@
 
         <Button
             android:id="@+id/btnCamera"
-            android:layout_weight="1"
-            android:layout_width="match_parent"
+            android:layout_width="133dp"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimaryDark"
             android:textColor="#FFF"
-            android:text="Open Camera"/>
+            android:text="Photo Camera"/>
+
+        <Button
+            android:id="@+id/btnCameraVideo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorAccent"
+            android:textColor="#FFF"
+            android:text="Video Camera"
+            android:layout_weight="0.26" />
 
     </LinearLayout>
 
