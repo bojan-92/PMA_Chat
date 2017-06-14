@@ -71,6 +71,15 @@
             android:text="Video Camera"
             android:layout_weight="0.26" />
 
+        <Button
+            android:id="@+id/btnMap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorAccent"
+            android:textColor="#FFF"
+            android:text="Share Location"
+            android:layout_weight="0.26" />
+
     </LinearLayout>
 
     <ProgressBar
