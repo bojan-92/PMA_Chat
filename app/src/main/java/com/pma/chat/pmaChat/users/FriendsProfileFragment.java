@@ -23,8 +23,8 @@ public class FriendsProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.friends_profile, container, false);
-        Button btnChat = (Button) view.findViewById(R.id.chatButton);
-        btnChat.setOnClickListener(new View.OnClickListener() {
+        Button chatButton = (Button) view.findViewById(R.id.chatButton);
+        chatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(view.getContext(), ChatActivity.class);
