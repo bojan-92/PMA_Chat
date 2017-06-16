@@ -1,4 +1,4 @@
-package com.pma.chat.pmaChat.users;
+package com.pma.chat.pmaChat.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,11 +10,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.pma.chat.pmaChat.R;
-import com.pma.chat.pmaChat.chat.ChatActivity;
+import com.pma.chat.pmaChat.activities.ChatActivity;
 
-/**
- * Created by david on 4/29/17.
- */
 
 public class FriendsProfileFragment extends Fragment {
 

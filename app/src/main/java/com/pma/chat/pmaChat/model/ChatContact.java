@@ -4,11 +4,9 @@ package com.pma.chat.pmaChat.model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-/**
- * Created by Bojan on 6/14/2017.
- */
+
 @DatabaseTable(tableName = "contact")
-public class Contact {
+public class ChatContact {
 
 
     @DatabaseField(generatedId = true)
@@ -20,9 +18,14 @@ public class Contact {
     @DatabaseField
     private String number;
 
-    public Contact(Long id, String name) {
+    public ChatContact() {
+        // needed by ormlite
+    }
+
+    public ChatContact(Long id, String name, String number) {
         this.id = id;
         this.name = name;
+        this.number = number;
     }
 
     public Long getId() {
@@ -47,5 +50,14 @@ public class Contact {
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    @Override
+    public String toString() {
+        return "ChatContact{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", number='" + number + '\'' +
+                '}';
     }
 }

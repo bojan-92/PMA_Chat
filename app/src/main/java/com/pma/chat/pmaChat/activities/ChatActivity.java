@@ -1,4 +1,4 @@
-package com.pma.chat.pmaChat.chat;
+package com.pma.chat.pmaChat.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,7 +20,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,8 +33,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.pma.chat.pmaChat.R;
-import com.pma.chat.pmaChat.adapters.MessageAdapter;
-import com.pma.chat.pmaChat.auth.LoginScreen;
+import com.pma.chat.pmaChat.adapters.ChatMessageListAdapter;
+import com.pma.chat.pmaChat.auth.LoginActivity;
 import com.pma.chat.pmaChat.model.Message;
 import com.pma.chat.pmaChat.model.MessageType;
 
@@ -64,7 +62,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private ProgressBar mProgressBar;
 
-    private MessageAdapter mMessageAdapter;
+    private ChatMessageListAdapter mMessageAdapter;
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseStorage mFirebaseStorage;
@@ -111,7 +109,7 @@ public class ChatActivity extends AppCompatActivity {
 
         // Initialize message ListView and its adapter
         List<Message> messages = new ArrayList<>();
-        mMessageAdapter = new MessageAdapter(this, R.layout.item_message, messages);
+        mMessageAdapter = new ChatMessageListAdapter(this, R.layout.item_message, messages);
         mMessagesListView.setAdapter(mMessageAdapter);
 
         // Initialize progress bar
@@ -191,7 +189,7 @@ public class ChatActivity extends AppCompatActivity {
                     // User is signed out
                     onSignedOutCleanup();
                     finish();
-                    startActivity(new Intent(getApplicationContext(), LoginScreen.class));
+                    startActivity(new Intent(getApplicationContext(), LoginActivity.class));
                 }
             }
         };

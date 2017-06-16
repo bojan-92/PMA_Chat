@@ -1,4 +1,4 @@
-package com.pma.chat.pmaChat.providers;
+package com.pma.chat.pmaChat.data;
 
 import android.content.Context;
 import android.database.SQLException;
@@ -10,33 +10,29 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
-import com.pma.chat.pmaChat.model.Contact;
+import com.pma.chat.pmaChat.model.ChatContact;
 
-/**
- * Created by Bojan on 6/14/2017.
- */
 
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     // name of the database file for your application -- change to something appropriate for your app
-    private static final String DATABASE_NAME = "helloAndroid.db";
+    private static final String DATABASE_NAME = "pmaChat.db";
     // any time you make changes to your database objects, you may have to increase the database version
     private static final int DATABASE_VERSION = 1;
 
-    // the DAO object we use to access the SimpleData table
-    private Dao<Contact, Integer> simpleDao = null;
-    private RuntimeExceptionDao<Contact, Integer> simpleRuntimeDao = null;
+    // the DAO object we use to access the contact table
+    private Dao<ChatContact, Integer> simpleDao = null;
+    private RuntimeExceptionDao<ChatContact, Integer> simpleRuntimeDao = null;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-
     @Override
     public void onCreate(SQLiteDatabase db, ConnectionSource connectionSource) {
         try {
             Log.i(DatabaseHelper.class.getName(), "onCreate");
-            TableUtils.createTable(connectionSource, Contact.class);
+            TableUtils.createTable(connectionSource, ChatContact.class);
         } catch (SQLException e) {
             Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
             throw new RuntimeException(e);
@@ -45,9 +41,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
 
         // here we try inserting data in the on-create as a test
-        RuntimeExceptionDao<Contact, Integer> dao = getContactDao();
+        RuntimeExceptionDao<ChatContact, Integer> dao = getContactDao();
 
-        Contact contact = new Contact(1000L, "Novi Kontakt");
+        ChatContact contact = new ChatContact(1000L, "Novi Kontakt", "1253645");
         dao.create(contact);
 
         Log.i(DatabaseHelper.class.getName(), "created new entries in onCreate: " + contact.getName());
@@ -61,7 +57,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
         try {
             Log.i(DatabaseHelper.class.getName(), "onUpgrade");
-            TableUtils.dropTable(connectionSource, Contact.class, true);
+            TableUtils.dropTable(connectionSource, ChatContact.class, true);
             // after we drop the old databases, we create the new ones
             onCreate(db, connectionSource);
         } catch (SQLException e) {
@@ -76,9 +72,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
      * Returns the Database Access Object (DAO) for our SimpleData class. It will create it or just give the cached
      * value.
      */
-    public Dao<Contact, Integer> getDao() throws SQLException, java.sql.SQLException {
+    public Dao<ChatContact, Integer> getDao() throws SQLException, java.sql.SQLException {
         if (simpleDao == null) {
-            simpleDao = getDao(Contact.class);
+            simpleDao = getDao(ChatContact.class);
         }
         return simpleDao;
     }
@@ -87,9 +83,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
      * Returns the RuntimeExceptionDao (Database Access Object) version of a Dao for our SimpleData class. It will
      * create it or just give the cached value. RuntimeExceptionDao only through RuntimeExceptions.
      */
-    public RuntimeExceptionDao<Contact, Integer> getContactDao() {
+    public RuntimeExceptionDao<ChatContact, Integer> getContactDao() {
         if (simpleRuntimeDao == null) {
-            simpleRuntimeDao = getRuntimeExceptionDao(Contact.class);
+            simpleRuntimeDao = getRuntimeExceptionDao(ChatContact.class);
         }
         return simpleRuntimeDao;
     }

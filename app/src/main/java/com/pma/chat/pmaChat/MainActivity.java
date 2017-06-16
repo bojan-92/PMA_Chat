@@ -17,17 +17,18 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.pma.chat.pmaChat.adapters.DrawerListAdapter;
-import com.pma.chat.pmaChat.auth.LoginScreen;
+import com.pma.chat.pmaChat.auth.LoginActivity;
 import com.pma.chat.pmaChat.model.NavItem;
-import com.pma.chat.pmaChat.providers.DatabaseHelper;
-import com.pma.chat.pmaChat.users.FriendsListFragment;
-import com.pma.chat.pmaChat.users.FriendsProfileFragment;
-import com.pma.chat.pmaChat.users.ProfileSettingsFragment;
+import com.pma.chat.pmaChat.data.DatabaseHelper;
+import com.pma.chat.pmaChat.fragments.ChatContactListFragment;
+import com.pma.chat.pmaChat.fragments.FriendsProfileFragment;
+import com.pma.chat.pmaChat.fragments.ProfileSettingsFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+
+public class MainActivity extends AppCompatActivity  {
 
     private ListView mListView;
     private List<NavItem> mNavItems = new ArrayList<NavItem>();
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(mFirebaseAuth.getCurrentUser() == null){
             finish();
-            startActivity(new Intent(getApplicationContext(), LoginScreen.class));
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
         }
 
         mListView = (ListView) findViewById(R.id.listview);
@@ -77,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, position + "", Toast.LENGTH_SHORT).show();
                 switch (position){
                     case 1:
-                        fragment = new FriendsListFragment();
+                        fragment = new ChatContactListFragment();
                         break;
                     case 2:
                         fragment = new ProfileSettingsFragment();
@@ -87,11 +88,11 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 4:
                         mFirebaseAuth.signOut();
-                        Intent i = new Intent(MainActivity.this.getApplicationContext(), LoginScreen.class);
+                        Intent i = new Intent(MainActivity.this.getApplicationContext(), LoginActivity.class);
                         startActivity(i);
                         return;
                     default:
-                        fragment = new FriendsListFragment();
+                        fragment = new ChatContactListFragment();
                         break;
                 }
                 FragmentManager fragmentManager = getSupportFragmentManager();
@@ -99,8 +100,6 @@ public class MainActivity extends AppCompatActivity {
                 mDrawerLayout.closeDrawers();
             }
         });
-
-
 
     }
 
@@ -133,4 +132,5 @@ public class MainActivity extends AppCompatActivity {
         mNavItems.add(new NavItem(getString(R.string.logout), R.drawable.ic_exit_to_app_black_24px));
 
     }
+
 }

@@ -19,11 +19,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.pma.chat.pmaChat.MainActivity;
 import com.pma.chat.pmaChat.R;
 
-/**
- * Created by Bojan on 4/23/2017.
- */
 
-public class LoginScreen extends Activity {
+public class LoginActivity extends Activity {
 
     private EditText txtEmail;
     private EditText txtPassword;
@@ -69,7 +66,7 @@ public class LoginScreen extends Activity {
         tvGoToSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), SignupScreen.class);
+                Intent i = new Intent(getApplicationContext(), SignupActivity.class);
                 startActivity(i);
             }
         });
@@ -99,7 +96,7 @@ public class LoginScreen extends Activity {
                             finish();
                             startActivity(new Intent(getApplicationContext(), MainActivity.class));
                         } else {
-                            Toast.makeText(LoginScreen.this, R.string.loginFailedMessage, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, R.string.loginFailedMessage, Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -107,11 +104,11 @@ public class LoginScreen extends Activity {
 
     private boolean isFormValid(String email, String password) {
         if (TextUtils.isEmpty(email)) {
-            Toast.makeText(LoginScreen.this, R.string.emailFieldEmptyMessage, Toast.LENGTH_SHORT).show();
+            Toast.makeText(LoginActivity.this, R.string.emailFieldEmptyMessage, Toast.LENGTH_SHORT).show();
             return false;
         }
         if (TextUtils.isEmpty(password)) {
-            Toast.makeText(LoginScreen.this, R.string.passwordFieldEmptyMessage, Toast.LENGTH_SHORT).show();
+            Toast.makeText(LoginActivity.this, R.string.passwordFieldEmptyMessage, Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;

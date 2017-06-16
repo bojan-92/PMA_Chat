@@ -28,11 +28,8 @@ import com.pma.chat.pmaChat.model.UserInfo;
 
 import java.util.Calendar;
 
-/**
- * Created by Bojan on 4/24/2017.
- */
 
-public class SignupScreen extends Activity {
+public class SignupActivity extends Activity {
 
     private UserInfo userInfo;
 
@@ -102,7 +99,7 @@ public class SignupScreen extends Activity {
         tvGoToLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), LoginScreen.class);
+                Intent i = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(i);
             }
         });
@@ -110,7 +107,7 @@ public class SignupScreen extends Activity {
         btnDatePicker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DatePickerDialog dpd = new DatePickerDialog(SignupScreen.this, date, calendar.get(Calendar.YEAR),
+                DatePickerDialog dpd = new DatePickerDialog(SignupActivity.this, date, calendar.get(Calendar.YEAR),
                         calendar.get(Calendar.MONTH),
                         calendar.get(Calendar.DAY_OF_MONTH));
                 dpd.getDatePicker().setMaxDate(System.currentTimeMillis());
@@ -136,7 +133,7 @@ public class SignupScreen extends Activity {
                 }
 
                 if (!password.equals(passwordConfirm)) {
-                    Toast.makeText(SignupScreen.this, R.string.passwordAndConfirmationDoNotMatchMessage, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignupActivity.this, R.string.passwordAndConfirmationDoNotMatchMessage, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -163,17 +160,17 @@ public class SignupScreen extends Activity {
                                         @Override
                                         public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                                             if (databaseError != null) {
-                                                Toast.makeText(SignupScreen.this, R.string.failedSavingUserInfoMessage, Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(SignupActivity.this, R.string.failedSavingUserInfoMessage, Toast.LENGTH_SHORT).show();
                                             } else {
                                                 firebaseAuth.signOut();
                                             }
                                         }
                                     });
 
-                                    Toast.makeText(SignupScreen.this, R.string.successfulRegistrationMessage, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(SignupActivity.this, R.string.successfulRegistrationMessage, Toast.LENGTH_SHORT).show();
 
                                 } else {
-                                    Toast.makeText(SignupScreen.this, R.string.failedRegistrationMessage, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(SignupActivity.this, R.string.failedRegistrationMessage, Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
@@ -199,27 +196,27 @@ public class SignupScreen extends Activity {
 
     private boolean isFormValid(String email, String password, String passwordConfirm, String firstName, String lastName, String phoneNumber) {
         if (TextUtils.isEmpty(email)) {
-            Toast.makeText(SignupScreen.this, R.string.emailFieldEmptyMessage, Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, R.string.emailFieldEmptyMessage, Toast.LENGTH_SHORT).show();
             return false;
         }
         if (TextUtils.isEmpty(password)) {
-            Toast.makeText(SignupScreen.this, R.string.passwordFieldEmptyMessage, Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, R.string.passwordFieldEmptyMessage, Toast.LENGTH_SHORT).show();
             return false;
         }
         if (TextUtils.isEmpty(passwordConfirm)) {
-            Toast.makeText(SignupScreen.this, R.string.passwordConfirmFieldEmptyMessage, Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, R.string.passwordConfirmFieldEmptyMessage, Toast.LENGTH_SHORT).show();
             return false;
         }
         if (TextUtils.isEmpty(firstName)) {
-            Toast.makeText(SignupScreen.this, R.string.firstNameFieldEmptyMessage, Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, R.string.firstNameFieldEmptyMessage, Toast.LENGTH_SHORT).show();
             return false;
         }
         if (TextUtils.isEmpty(lastName)) {
-            Toast.makeText(SignupScreen.this, R.string.lastNameFieldEmptyMessage, Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, R.string.lastNameFieldEmptyMessage, Toast.LENGTH_SHORT).show();
             return false;
         }
         if (TextUtils.isEmpty(phoneNumber)) {
-            Toast.makeText(SignupScreen.this, R.string.phoneNumberFieldEmptyMessage, Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, R.string.phoneNumberFieldEmptyMessage, Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;

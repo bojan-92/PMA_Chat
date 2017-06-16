@@ -1,4 +1,4 @@
-package com.pma.chat.pmaChat.users;
+package com.pma.chat.pmaChat.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,12 +11,8 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.pma.chat.pmaChat.R;
-import com.pma.chat.pmaChat.auth.LoginScreen;
-import com.pma.chat.pmaChat.auth.SignupScreen;
+import com.pma.chat.pmaChat.auth.LoginActivity;
 
-/**
- * Created by david on 4/29/17.
- */
 
 public class ProfileSettingsFragment extends Fragment {
 
@@ -38,7 +34,7 @@ public class ProfileSettingsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 firebaseAuth.signOut();
-                Intent i = new Intent(getActivity().getApplicationContext(), LoginScreen.class);
+                Intent i = new Intent(getActivity().getApplicationContext(), LoginActivity.class);
                 startActivity(i);
             }
         });

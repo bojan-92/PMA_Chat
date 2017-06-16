@@ -43,6 +43,7 @@ dependencies {
     compile 'com.android.support:support-fragment:25.0.1'
     // https://mvnrepository.com/artifact/com.j256.ormlite/ormlite-android
     compile group: 'com.j256.ormlite', name: 'ormlite-android', version: '4.48'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
 
     testCompile 'junit:junit:4.12'

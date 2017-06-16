@@ -15,9 +15,9 @@ import com.pma.chat.pmaChat.model.MessageType;
 
 import java.util.List;
 
-public class MessageAdapter extends ArrayAdapter<Message> {
+public class ChatMessageListAdapter extends ArrayAdapter<Message> {
 
-    public MessageAdapter(Context context, int resource, List<Message> objects) {
+    public ChatMessageListAdapter(Context context, int resource, List<Message> objects) {
         super(context, resource, objects);
     }
 

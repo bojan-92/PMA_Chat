@@ -8,11 +8,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.model.UserInfo;
+import com.pma.chat.pmaChat.R;
 
 
-class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.FriendListAdapterViewHolder> {
+class ChatContactListAdapter extends RecyclerView.Adapter<ChatContactListAdapter.FriendListAdapterViewHolder> {
 
     /* The context we use to utility methods, app resources and layout inflaters */
     private final Context mContext;
@@ -25,7 +25,7 @@ class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.FriendLis
      */
     private final FriendListAdapterOnClickHandler mClickHandler;
 
-    public FriendListAdapter(Context mContext, FriendListAdapterOnClickHandler mClickHandler) {
+    public ChatContactListAdapter(Context mContext, FriendListAdapterOnClickHandler mClickHandler) {
         this.mContext = mContext;
         this.mClickHandler = mClickHandler;
     }
