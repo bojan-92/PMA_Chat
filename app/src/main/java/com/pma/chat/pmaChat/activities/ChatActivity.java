@@ -21,6 +21,11 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -35,6 +40,7 @@ import com.google.firebase.storage.UploadTask;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.adapters.ChatMessageListAdapter;
 import com.pma.chat.pmaChat.auth.LoginActivity;
+import com.pma.chat.pmaChat.model.MapModel;
 import com.pma.chat.pmaChat.model.Message;
 import com.pma.chat.pmaChat.model.MessageType;
 
@@ -55,10 +61,12 @@ public class ChatActivity extends AppCompatActivity {
     private Button mSendMessageButton;
     private ListView mMessagesListView;
     private Button mCameraButton;
+    private Button mMapButton;
     private ImageView mCameraView;
     private Button mCameraVideoButton;
-
+    LatLng latLng;
     private ImageButton mPhotoPickerButton;
+    private static final int PLACE_PICKER_REQUEST = 123;
 
     private ProgressBar mProgressBar;
 
@@ -97,7 +105,6 @@ public class ChatActivity extends AppCompatActivity {
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseStorage = FirebaseStorage.getInstance();
         mChatPhotosStorageReference = mFirebaseStorage.getReference().child("chat_photos");
-
         // Initialize references to views
         mProgressBar = (ProgressBar) findViewById(R.id.chatMessagesProgressBar);
         mMessageEditText = (EditText) findViewById(R.id.chatMessageField);
@@ -106,6 +113,7 @@ public class ChatActivity extends AppCompatActivity {
         mPhotoPickerButton = (ImageButton) findViewById(R.id.photoPickerButton);
         mCameraButton = (Button) findViewById(R.id.btnCamera);
         mCameraVideoButton = (Button) findViewById(R.id.btnCameraVideo);
+        mMapButton = (Button)findViewById(R.id.btnMap);
 
         // Initialize message ListView and its adapter
         List<Message> messages = new ArrayList<>();
@@ -116,6 +124,13 @@ public class ChatActivity extends AppCompatActivity {
         mProgressBar.setVisibility(ProgressBar.INVISIBLE);
 
         // Enable Send button when there's text to send
+
+        mMapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                locationPlacesIntent();
+            }
+        });
 
         mMessageEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -261,6 +276,14 @@ public class ChatActivity extends AppCompatActivity {
                             mMessagesDatabaseReference.push().setValue(message);
                         }
                     });
+        }
+
+        if (requestCode == PLACE_PICKER_REQUEST && resultCode == RESULT_OK){
+            Place place = PlacePicker.getPlace(this, data);
+            if (place != null){
+                latLng = place.getLatLng();
+                MapModel mapModel = new MapModel(latLng.latitude + "", latLng.longitude + "");
+            }
         }
     }
 
@@ -410,6 +433,16 @@ public class ChatActivity extends AppCompatActivity {
 
         // Save a file: path for use with ACTION_VIEW intents
         return video;
+    }
+
+    private void locationPlacesIntent(){
+        try {
+            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+            startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
+
+        } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+            e.printStackTrace();
+        }
     }
 
 }

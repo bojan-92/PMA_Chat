@@ -30,6 +30,7 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
 
         ImageView messagePhotoImageView = (ImageView) convertView.findViewById(R.id.chatMessagePhoto);
         TextView messageContentTextView = (TextView) convertView.findViewById(R.id.chatMessageContent);
+
       //  TextView tvMessageAuthor = (TextView) convertView.findViewById(R.id.chatMessageAuthor);
 
         Message message = getItem(position);
@@ -57,6 +58,11 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
                         .into(messagePhotoImageView);
                 break;
             case VIDEO:
+                messageContentTextView.setVisibility(View.GONE);
+                messagePhotoImageView.setVisibility(View.VISIBLE);
+                Glide.with(messagePhotoImageView.getContext())
+                        .load(message.getContent())
+                        .into(messagePhotoImageView);
                 break;
             case SOUND:
                 break;
