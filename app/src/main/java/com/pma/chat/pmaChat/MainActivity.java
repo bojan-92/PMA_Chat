@@ -21,7 +21,7 @@ import com.pma.chat.pmaChat.auth.LoginActivity;
 import com.pma.chat.pmaChat.model.NavItem;
 import com.pma.chat.pmaChat.data.DatabaseHelper;
 import com.pma.chat.pmaChat.fragments.ChatContactListFragment;
-import com.pma.chat.pmaChat.fragments.FriendsProfileFragment;
+import com.pma.chat.pmaChat.fragments.ChatContactProfileFragment;
 import com.pma.chat.pmaChat.fragments.ProfileSettingsFragment;
 
 import java.util.ArrayList;
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity  {
                         fragment = new ProfileSettingsFragment();
                         break;
                     case 3:
-                        fragment = new FriendsProfileFragment();
+                        fragment = new ChatContactProfileFragment();
                         break;
                     case 4:
                         mFirebaseAuth.signOut();

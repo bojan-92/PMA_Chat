@@ -1,102 +1,53 @@
 package com.pma.chat.pmaChat.data;
 
 import android.content.Context;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
+import android.database.sqlite.SQLiteOpenHelper;
 
-import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.RuntimeExceptionDao;
-import com.j256.ormlite.support.ConnectionSource;
-import com.j256.ormlite.table.TableUtils;
-import com.pma.chat.pmaChat.model.ChatContact;
+import com.pma.chat.pmaChat.data.ChatContactContract.ChatContactEntry;
+import com.pma.chat.pmaChat.data.MessageContract.MessageEntry;
 
 
-public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
+public class DatabaseHelper extends SQLiteOpenHelper {
 
     // name of the database file for your application -- change to something appropriate for your app
     private static final String DATABASE_NAME = "pmaChat.db";
     // any time you make changes to your database objects, you may have to increase the database version
     private static final int DATABASE_VERSION = 1;
 
-    // the DAO object we use to access the contact table
-    private Dao<ChatContact, Integer> simpleDao = null;
-    private RuntimeExceptionDao<ChatContact, Integer> simpleRuntimeDao = null;
-
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
-    public void onCreate(SQLiteDatabase db, ConnectionSource connectionSource) {
-        try {
-            Log.i(DatabaseHelper.class.getName(), "onCreate");
-            TableUtils.createTable(connectionSource, ChatContact.class);
-        } catch (SQLException e) {
-            Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
-            throw new RuntimeException(e);
-        } catch (java.sql.SQLException e) {
-            e.printStackTrace();
-        }
+    public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
-        // here we try inserting data in the on-create as a test
-        RuntimeExceptionDao<ChatContact, Integer> dao = getContactDao();
+        final String SQL_CREATE_CHAT_CONTACT_TABLE =
+                "CREATE TABLE " + ChatContactEntry.TABLE_NAME + " (" +
+                        ChatContactEntry._ID            + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        ChatContactEntry.COLUMN_NAME    + " TEXT NOT NULL, " +
+                        ChatContactEntry.COLUMN_NUMBER  + " TEXT NOT NULL )" ;
 
-        ChatContact contact = new ChatContact(1000L, "Novi Kontakt", "1253645");
-        dao.create(contact);
+        final String SQL_CREATE_MESSAGE_TABLE =
+                "CREATE TABLE " + MessageEntry.TABLE_NAME + " (" +
+                        MessageEntry._ID                    + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        MessageEntry.COLUMN_CHAT_CONTACT_ID + " INTEGER NOT NULL, " +
+                        // SQLite does not have a separate Boolean storage class. Instead,
+                        // Boolean values are stored as integers 0 (false) and 1 (true).
+                        MessageEntry.COLUMN_IS_SENDER       + " INTEGER NOT NULL, " +
+                        MessageEntry.COLUMN_TYPE            + " TEXT NOT NULL, " +
+                        MessageEntry.COLUMN_CONTENT         + " TEXT NOT NULL, " +
+                        MessageEntry.COLUMN_TIMESTAMP       + " TEXT NOT NULL)";
 
-        Log.i(DatabaseHelper.class.getName(), "created new entries in onCreate: " + contact.getName());
+        sqLiteDatabase.execSQL(SQL_CREATE_CHAT_CONTACT_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_MESSAGE_TABLE);
     }
 
-    /**
-     * This is called when your application is upgraded and it has a higher version number. This allows you to adjust
-     * the various data to match the new version number.
-     */
     @Override
-    public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
-        try {
-            Log.i(DatabaseHelper.class.getName(), "onUpgrade");
-            TableUtils.dropTable(connectionSource, ChatContact.class, true);
-            // after we drop the old databases, we create the new ones
-            onCreate(db, connectionSource);
-        } catch (SQLException e) {
-            Log.e(DatabaseHelper.class.getName(), "Can't drop databases", e);
-            throw new RuntimeException(e);
-        } catch (java.sql.SQLException e) {
-            e.printStackTrace();
-        }
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ChatContactEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MessageEntry.TABLE_NAME);
+        onCreate(sqLiteDatabase);
     }
 
-    /**
-     * Returns the Database Access Object (DAO) for our SimpleData class. It will create it or just give the cached
-     * value.
-     */
-    public Dao<ChatContact, Integer> getDao() throws SQLException, java.sql.SQLException {
-        if (simpleDao == null) {
-            simpleDao = getDao(ChatContact.class);
-        }
-        return simpleDao;
-    }
-
-    /**
-     * Returns the RuntimeExceptionDao (Database Access Object) version of a Dao for our SimpleData class. It will
-     * create it or just give the cached value. RuntimeExceptionDao only through RuntimeExceptions.
-     */
-    public RuntimeExceptionDao<ChatContact, Integer> getContactDao() {
-        if (simpleRuntimeDao == null) {
-            simpleRuntimeDao = getRuntimeExceptionDao(ChatContact.class);
-        }
-        return simpleRuntimeDao;
-    }
-
-    /**
-     * Close the database connections and clear any cached DAOs.
-     */
-    @Override
-    public void close() {
-        super.close();
-        simpleDao = null;
-        simpleRuntimeDao = null;
-    }
 }

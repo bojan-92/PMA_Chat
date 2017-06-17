@@ -1,22 +1,13 @@
 package com.pma.chat.pmaChat.model;
 
 
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
-
-
-@DatabaseTable(tableName = "contact")
 public class ChatContact {
 
-
-    @DatabaseField(generatedId = true)
     private Long id;
 
-    @DatabaseField
     private String name;
 
-    @DatabaseField
-    private String number;
+    private String phoneNumber;
 
     public ChatContact() {
         // needed by ormlite
@@ -25,7 +16,7 @@ public class ChatContact {
     public ChatContact(Long id, String name, String number) {
         this.id = id;
         this.name = name;
-        this.number = number;
+        this.phoneNumber = number;
     }
 
     public Long getId() {
@@ -44,12 +35,12 @@ public class ChatContact {
         this.name = name;
     }
 
-    public String getNumber() {
-        return number;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setNumber(String number) {
-        this.number = number;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     @Override
@@ -57,7 +48,7 @@ public class ChatContact {
         return "ChatContact{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", number='" + number + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
                 '}';
     }
 }

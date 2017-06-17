@@ -1,8 +1,7 @@
 package com.pma.chat.pmaChat.model;
 
-/**
- * Created by Mix on 5/24/17.
- */
+import java.util.Date;
+
 
 public class Message {
 
@@ -14,14 +13,17 @@ public class Message {
 
     private String receiverId;
 
+    private Date timestamp;
+
     public Message() {
     }
 
-    public Message(MessageType type, String content, String senderId, String receiverId) {
+    public Message(MessageType type, String content, String senderId, String receiverId, Date timestamp) {
         this.type = type;
         this.content = content;
         this.senderId = senderId;
         this.receiverId = receiverId;
+        this.timestamp = timestamp;
     }
 
     public String getContent() {
@@ -54,5 +56,13 @@ public class Message {
 
     public void setType(MessageType type) {
         this.type = type;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
 }

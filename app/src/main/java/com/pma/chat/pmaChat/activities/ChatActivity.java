@@ -142,10 +142,12 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 String messageContent = mMessageEditText.getText().toString();
-                Message message = new Message(MessageType.TEXT, messageContent, mFirebaseAuth.getCurrentUser().getUid(), null);
+                Message message = new Message(MessageType.TEXT, messageContent, mFirebaseAuth.getCurrentUser().getUid(), null, new Date());
 
                 String id = mMessagesDatabaseReference.push().getKey();
                 mMessagesDatabaseReference.child(id).setValue(message);
+
+                mMessageEditText.setText("");
             }
         });
 
@@ -174,9 +176,6 @@ public class ChatActivity extends AppCompatActivity {
             }
 
         });
-
-
-
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -216,7 +215,7 @@ public class ChatActivity extends AppCompatActivity {
                             @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
 
                             // Set the download URL to the message box, so that the user can send it to the database
-                            Message message = new Message(MessageType.PHOTO, downloadUrl.toString(), mFirebaseAuth.getCurrentUser().getUid(), null);
+                            Message message = new Message(MessageType.PHOTO, downloadUrl.toString(), mFirebaseAuth.getCurrentUser().getUid(), null, new Date());
                             mMessagesDatabaseReference.push().setValue(message);
                         }
                     });
@@ -237,7 +236,7 @@ public class ChatActivity extends AppCompatActivity {
                             @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
 
                             // Set the download URL to the message box, so that the user can send it to the database
-                            Message message = new Message(MessageType.VIDEO, downloadUrl.toString(), mFirebaseAuth.getCurrentUser().getUid(), null);
+                            Message message = new Message(MessageType.VIDEO, downloadUrl.toString(), mFirebaseAuth.getCurrentUser().getUid(), null, new Date());
                             mMessagesDatabaseReference.push().setValue(message);
                         }
                     });
@@ -258,7 +257,7 @@ public class ChatActivity extends AppCompatActivity {
                             @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
 
                             // Set the download URL to the message box, so that the user can send it to the database
-                            Message message = new Message(MessageType.PHOTO, downloadUrl.toString(), mFirebaseAuth.getCurrentUser().getUid(), null);
+                            Message message = new Message(MessageType.PHOTO, downloadUrl.toString(), mFirebaseAuth.getCurrentUser().getUid(), null, new Date());
                             mMessagesDatabaseReference.push().setValue(message);
                         }
                     });

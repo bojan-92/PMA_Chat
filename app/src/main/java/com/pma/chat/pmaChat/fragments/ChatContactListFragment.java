@@ -1,6 +1,7 @@
 package com.pma.chat.pmaChat.fragments;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -17,13 +18,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.pma.chat.pmaChat.R;
+import com.pma.chat.pmaChat.activities.ChatActivity;
 import com.pma.chat.pmaChat.data.PhoneContactListProvider;
+import com.pma.chat.pmaChat.model.UserInfo;
 
 import java.util.ArrayList;
 
@@ -34,7 +41,6 @@ public class ChatContactListFragment extends Fragment implements LoaderManager.L
     private DatabaseReference mUserInfoDatabaseReference = mRootDatabaseReference.child("userInfo");
 
     private ProgressBar mProgressBar;
-
     private final static String[] FROM_COLUMNS = {
             Build.VERSION.SDK_INT
                     >= Build.VERSION_CODES.HONEYCOMB ?
@@ -82,7 +88,7 @@ public class ChatContactListFragment extends Fragment implements LoaderManager.L
         ArrayList contacts = contactListProvider.fetchAll();
 
         Log.i("TEST", contacts.toString());
-/*
+
         mUserInfoDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -121,8 +127,6 @@ public class ChatContactListFragment extends Fragment implements LoaderManager.L
 
             }
         });
-*/
-
 
         return view;
 
@@ -142,11 +146,11 @@ public class ChatContactListFragment extends Fragment implements LoaderManager.L
                 FROM_COLUMNS, TO_IDS,
                 0);
 
-        listView.setAdapter(mChatContactsCursor);
+    //    listView.setAdapter(mChatContactsCursor);
 
         getLoaderManager().initLoader(0, null, this);
 
-        listView.setOnItemClickListener(this);
+    //    listView.setOnItemClickListener(this);
     }
 
     @Override

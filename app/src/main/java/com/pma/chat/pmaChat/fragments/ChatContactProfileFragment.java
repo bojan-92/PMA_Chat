@@ -13,7 +13,7 @@ import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.activities.ChatActivity;
 
 
-public class FriendsProfileFragment extends Fragment {
+public class ChatContactProfileFragment extends Fragment {
 
     @Nullable
     @Override
