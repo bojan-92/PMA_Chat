@@ -52,33 +52,44 @@
             android:id="@+id/photoPickerButton"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:background="@android:drawable/ic_menu_gallery" />
+            android:background="@drawable/ic_crop_original_black_24px" />
 
         <Button
             android:id="@+id/btnCamera"
-            android:layout_width="133dp"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/ic_camera_alt_black_24px"
             android:textColor="#FFF"
-            android:text="Photo Camera"/>
+            />
 
         <Button
             android:id="@+id/btnCameraVideo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/colorAccent"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/ic_movie_filter_black_24px"
             android:textColor="#FFF"
-            android:text="Video Camera"
-            android:layout_weight="0.26" />
+
+            />
+
+        <Button
+            android:id="@+id/btnSoundRecording"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/ic_mic_black_24px"
+            android:textColor="#FFF"
+
+            />
 
         <Button
             android:id="@+id/btnMap"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/colorAccent"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/ic_room_black_24px"
             android:textColor="#FFF"
-            android:text="Share Location"
-            android:layout_weight="0.26" />
+
+            />
+
+
 
     </LinearLayout>
 
