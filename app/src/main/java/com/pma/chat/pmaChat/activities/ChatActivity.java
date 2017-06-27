@@ -64,6 +64,7 @@ public class ChatActivity extends AppCompatActivity {
     private Button mMapButton;
     private ImageView mCameraView;
     private Button mCameraVideoButton;
+    private Button mSoundRecordingButton;
     LatLng latLng;
     private ImageButton mPhotoPickerButton;
     private static final int PLACE_PICKER_REQUEST = 123;
@@ -85,6 +86,9 @@ public class ChatActivity extends AppCompatActivity {
 
     private Uri mCurrentVideoPath;
 
+    private Uri mCurrentAudioPath;
+
+
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
 
     private static final int RC_PHOTO_PICKER = 2;
@@ -92,6 +96,8 @@ public class ChatActivity extends AppCompatActivity {
     private static final int RC_PHOTO_CAPTURE = 3;
 
     private static final int RC_VIDEO_CAPTURE = 4;
+
+    private static final int RC_AUDIO_CAPTURE = 5;
 
    // private static final int CAN_REQUEST=1313;
 
@@ -114,6 +120,7 @@ public class ChatActivity extends AppCompatActivity {
         mCameraButton = (Button) findViewById(R.id.btnCamera);
         mCameraVideoButton = (Button) findViewById(R.id.btnCameraVideo);
         mMapButton = (Button)findViewById(R.id.btnMap);
+        mSoundRecordingButton = (Button)findViewById(R.id.btnSoundRecording);
 
         // Initialize message ListView and its adapter
         List<Message> messages = new ArrayList<>();
@@ -192,6 +199,14 @@ public class ChatActivity extends AppCompatActivity {
 
         });
 
+        mSoundRecordingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dispatchTakeAudioIntent();
+            }
+
+        });
+
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -214,6 +229,28 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_AUDIO_CAPTURE && resultCode == RESULT_OK) {
+
+            Uri capturedAudioUri = mCurrentAudioPath;
+
+            // Get a reference to store file at chat_photos/<FILENAME>
+            StorageReference audioRef = mChatPhotosStorageReference.child(capturedAudioUri.getLastPathSegment());
+
+            // Upload file to Firebase Storage
+            audioRef.putFile(capturedAudioUri)
+                    .addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // When the image has successfully uploaded, we get its download URL
+                            @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
+
+                            // Set the download URL to the message box, so that the user can send it to the database
+                            Message message = new Message(MessageType.SOUND, downloadUrl.toString(), mFirebaseAuth.getCurrentUser().getUid(), null, new Date());
+                            mMessagesDatabaseReference.push().setValue(message);
+                        }
+                    });
+        }
+
 
         if (requestCode == RC_PHOTO_CAPTURE && resultCode == RESULT_OK) {
 
@@ -293,6 +330,8 @@ public class ChatActivity extends AppCompatActivity {
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
         return Uri.parse(path);
     }
+
+
 
 
 
@@ -433,6 +472,46 @@ public class ChatActivity extends AppCompatActivity {
 
         // Save a file: path for use with ACTION_VIEW intents
         return video;
+    }
+
+    private void dispatchTakeAudioIntent() {
+        Intent takeAudioIntent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
+        // Ensure that there's a camera activity to handle the intent
+        if (takeAudioIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File audioFile = null;
+            try {
+                audioFile = createAudioFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+
+            }
+            // Continue only if the File was successfully created
+            if (audioFile != null) {
+                Uri audioURI = FileProvider.getUriForFile(this,
+                        "com.pma.chat.pmaChat.fileprovider",
+                        audioFile);
+                mCurrentAudioPath = audioURI;
+                takeAudioIntent.putExtra(MediaStore.EXTRA_OUTPUT, audioURI);
+                startActivityForResult(takeAudioIntent, RC_AUDIO_CAPTURE);
+            }
+        }
+    }
+
+
+    private File createAudioFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String audioFileName = "MP3_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File audio = File.createTempFile(
+                audioFileName,  /* prefix */
+                ".mp3",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        return audio;
     }
 
     private void locationPlacesIntent(){

@@ -65,6 +65,11 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
                         .into(messagePhotoImageView);
                 break;
             case SOUND:
+//                messageContentTextView.setVisibility(View.GONE);
+//                messagePhotoImageView.setVisibility(View.VISIBLE);
+//                Glide.with(messagePhotoImageView.getContext())
+//                        .load(message.getContent())
+//                        .into(messagePhotoImageView);
                 break;
             case LOCATION:
                 break;
