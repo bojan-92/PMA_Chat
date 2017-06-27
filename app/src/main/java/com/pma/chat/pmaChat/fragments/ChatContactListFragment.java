@@ -1,18 +1,18 @@
 package com.pma.chat.pmaChat.fragments;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,43 +35,17 @@ import com.pma.chat.pmaChat.model.UserInfo;
 
 import java.util.ArrayList;
 
+//implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener
+public class ChatContactListFragment extends Fragment  {
 
-public class ChatContactListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener {
+    private final int REQUEST_CODE_ASK_PERMISSIONS = 123;
+
+    private ArrayList contacts;
 
     private DatabaseReference mRootDatabaseReference = FirebaseDatabase.getInstance().getReference();
     private DatabaseReference mUserInfoDatabaseReference = mRootDatabaseReference.child("userInfo");
 
     private ProgressBar mProgressBar;
-    private final static String[] FROM_COLUMNS = {
-            Build.VERSION.SDK_INT
-                    >= Build.VERSION_CODES.HONEYCOMB ?
-                    ContactsContract.Contacts.DISPLAY_NAME_PRIMARY :
-                    ContactsContract.Contacts.DISPLAY_NAME
-    };
-
-    private final static int[] TO_IDS = {
-            R.id.tv_contact_name
-    };
-
-    @SuppressLint("InlinedApi")
-    private static final String[] PROJECTION =
-            {
-                    ContactsContract.Contacts._ID,
-                    ContactsContract.Contacts.LOOKUP_KEY,
-                    Build.VERSION.SDK_INT
-                            >= Build.VERSION_CODES.HONEYCOMB ?
-                            ContactsContract.Contacts.DISPLAY_NAME_PRIMARY :
-                            ContactsContract.Contacts.DISPLAY_NAME
-
-            };
-
-    // The column index for the _ID column
-    private static final int CONTACT_ID_INDEX = 0;
-    // The column index for the LOOKUP_KEY column
-    private static final int LOOKUP_KEY_INDEX = 1;
-
-
-    private SimpleCursorAdapter mChatContactsCursor;
 
 
     @Nullable
@@ -83,11 +58,7 @@ public class ChatContactListFragment extends Fragment implements LoaderManager.L
 
         mProgressBar = (ProgressBar) view.findViewById(R.id.usersListProgressBar);
 
-        PhoneContactListProvider contactListProvider = new PhoneContactListProvider(getActivity());
-
-        ArrayList contacts = contactListProvider.fetchAll();
-
-        Log.i("TEST", contacts.toString());
+        readContactsWrapper();
 
         mUserInfoDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -97,7 +68,7 @@ public class ChatContactListFragment extends Fragment implements LoaderManager.L
 
                 ArrayList<String> users = new ArrayList<>();
 
-                for(DataSnapshot data : dataSnapshot.getChildren()) {
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
                     users.add(data.getValue(UserInfo.class).getFirstName() + " " + data.getValue(UserInfo.class).getLastName());
                 }
 
@@ -132,60 +103,66 @@ public class ChatContactListFragment extends Fragment implements LoaderManager.L
 
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        // Always call the super method first
-        super.onActivityCreated(savedInstanceState);
+    private void readContactsWrapper() {
+        int hasReadContactsPermission = ContextCompat.checkSelfPermission(getActivity(),
+                android.Manifest.permission.READ_CONTACTS);
+        if (hasReadContactsPermission != PackageManager.PERMISSION_GRANTED) {
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                    android.Manifest.permission.READ_CONTACTS)) {
+                showMessageOKCancel("You need to allow access to Contacts",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ActivityCompat.requestPermissions(getActivity(),
+                                        new String[] {android.Manifest.permission.READ_CONTACTS},
+                                        REQUEST_CODE_ASK_PERMISSIONS);
+                            }
+                        });
+                return;
+            }
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[] {android.Manifest.permission.READ_CONTACTS},
+                    REQUEST_CODE_ASK_PERMISSIONS);
+            return;
+        }
+        readContacts();
+    }
 
-        ListView listView = (ListView) getActivity().findViewById(R.id.friendsList);
-
-        mChatContactsCursor = new SimpleCursorAdapter(
-                getActivity(),
-                R.layout.user_list_item,
-                null,
-                FROM_COLUMNS, TO_IDS,
-                0);
-
-    //    listView.setAdapter(mChatContactsCursor);
-
-        getLoaderManager().initLoader(0, null, this);
-
-    //    listView.setOnItemClickListener(this);
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(this.getActivity())
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
-        mProgressBar.setVisibility(ProgressBar.VISIBLE);
-
-        Uri contentUri = Uri.withAppendedPath(
-                ContactsContract.Contacts.CONTENT_FILTER_URI,
-                Uri.encode(""));
-
-        return new CursorLoader(
-                getActivity(),
-                ContactsContract.Contacts.CONTENT_URI,
-                PROJECTION,
-                null,
-                null,
-                null
-        );
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_PERMISSIONS:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                    readContacts();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(this.getActivity(), "READ_CONTACTS Denied", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mChatContactsCursor.swapCursor(data);
-        mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+    public void readContacts() {
+        PhoneContactListProvider contactListProvider = new PhoneContactListProvider(getActivity());
+        contacts = contactListProvider.fetchAll();
+
+        Log.i("TEST", contacts.toString());
 
     }
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mChatContactsCursor.swapCursor(null);
-    }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-    }
 }
