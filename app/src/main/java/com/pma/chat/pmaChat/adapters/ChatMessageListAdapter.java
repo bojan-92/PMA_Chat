@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.model.Message;
-import com.pma.chat.pmaChat.model.MessageType;
 
 import java.util.List;
 
@@ -25,7 +24,7 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         if (convertView == null) {
-            convertView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.chat_messages_list_item, parent, false);
+            convertView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.item_chat_message, parent, false);
         }
 
         ImageView messagePhotoImageView = (ImageView) convertView.findViewById(R.id.chatMessagePhoto);

@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_friendsList"
+        android:id="@+id/rv_chat_contacts"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
@@ -12,7 +12,7 @@
 
     <!-- A progress bar that will be shown to users to indicate that weather data is loading -->
     <ProgressBar
-        android:id="@+id/pb_loadingFriendsList"
+        android:id="@+id/pb_chat_contacts"
         android:layout_width="42dp"
         android:layout_height="42dp"
         android:layout_gravity="center"

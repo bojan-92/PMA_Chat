@@ -13,7 +13,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.pma.chat.pmaChat.adapters.DrawerListAdapter;
@@ -75,7 +74,6 @@ public class MainActivity extends AppCompatActivity  {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Fragment fragment;
-                Toast.makeText(MainActivity.this, position + "", Toast.LENGTH_SHORT).show();
                 switch (position){
                     case 1:
                         fragment = new ChatContactListFragment();
@@ -108,7 +106,7 @@ public class MainActivity extends AppCompatActivity  {
      */
     private void initDrawerListHeader() {
         LayoutInflater inflater = getLayoutInflater();
-        View listHeaderView = inflater.inflate(R.layout.nav_header_main,null, false);
+        View listHeaderView = inflater.inflate(R.layout.partial_navigation_drawer_header,null, false);
 
         mDrawerHeaderAvatar = (ImageView) listHeaderView.findViewById(R.id.drawer_header_avatar);
         mDrawerHeaderUsername = (TextView) listHeaderView.findViewById(R.id.drawer_header_username);

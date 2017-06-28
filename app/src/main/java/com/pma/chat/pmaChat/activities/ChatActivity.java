@@ -88,7 +88,6 @@ public class ChatActivity extends AppCompatActivity {
 
     private Uri mCurrentAudioPath;
 
-
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
 
     private static final int RC_PHOTO_PICKER = 2;
@@ -99,14 +98,12 @@ public class ChatActivity extends AppCompatActivity {
 
     private static final int RC_AUDIO_CAPTURE = 5;
 
-   // private static final int CAN_REQUEST=1313;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.chat_screen);
+        setContentView(R.layout.activity_chat);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseStorage = FirebaseStorage.getInstance();
@@ -124,7 +121,7 @@ public class ChatActivity extends AppCompatActivity {
 
         // Initialize message ListView and its adapter
         List<Message> messages = new ArrayList<>();
-        mMessageAdapter = new ChatMessageListAdapter(this, R.layout.item_message, messages);
+        mMessageAdapter = new ChatMessageListAdapter(this, R.layout.item_chat_message, messages);
         mMessagesListView.setAdapter(mMessageAdapter);
 
         // Initialize progress bar

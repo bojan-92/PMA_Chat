@@ -34,7 +34,7 @@ class ChatContactListAdapter extends RecyclerView.Adapter<ChatContactListAdapter
     public FriendListAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         Context context = parent.getContext();
-        int layoutId = R.layout.friends_list_item;
+        int layoutId = R.layout.item_chat_contact;
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
 

@@ -19,7 +19,7 @@ public class ChatContactProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.friends_profile, container, false);
+        View view = inflater.inflate(R.layout.fragment_chat_contact_profile, container, false);
         Button chatButton = (Button) view.findViewById(R.id.chatButton);
         chatButton.setOnClickListener(new View.OnClickListener() {
             @Override
