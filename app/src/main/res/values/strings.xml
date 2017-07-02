@@ -44,7 +44,7 @@
     <string name="chatMessageSendText">Send</string>
     <string name="save">Save</string>
     <string name="selectedDateOfBirth">Date of birth</string>
-    <string name="successfulRegistrationMessage">Successful Registration! You can login now</string>
+    <string name="successfulRegistrationMessage">Successful Registration! You are logged in</string>
     <string name="failedRegistrationMessage">Registration Failed!</string>
     <string name="passwordAndConfirmationDoNotMatchMessage">Password and Password Confirm do not match!</string>
     <string name="registeringUserMessage">Registering User ...</string>

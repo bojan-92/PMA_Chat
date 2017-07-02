@@ -39,15 +39,19 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.adapters.ChatMessageListAdapter;
+import com.pma.chat.pmaChat.auth.AuthService;
+import com.pma.chat.pmaChat.auth.AuthServiceImpl;
 import com.pma.chat.pmaChat.auth.LoginActivity;
 import com.pma.chat.pmaChat.model.MapModel;
 import com.pma.chat.pmaChat.model.Message;
 import com.pma.chat.pmaChat.model.MessageType;
+import com.pma.chat.pmaChat.utils.AppUtils;
+import com.pma.chat.pmaChat.utils.FileUtils;
+import com.pma.chat.pmaChat.utils.RemoteConfig;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -65,13 +69,15 @@ public class ChatActivity extends AppCompatActivity {
     private ImageView mCameraView;
     private Button mCameraVideoButton;
     private Button mSoundRecordingButton;
-    LatLng latLng;
     private ImageButton mPhotoPickerButton;
-    private static final int PLACE_PICKER_REQUEST = 123;
+
+    private LatLng latLng;
 
     private ProgressBar mProgressBar;
 
     private ChatMessageListAdapter mMessageAdapter;
+
+    private AuthService mAuthService;
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseStorage mFirebaseStorage;
@@ -79,14 +85,14 @@ public class ChatActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     private DatabaseReference mRootDatabaseReference = FirebaseDatabase.getInstance().getReference();
-    private DatabaseReference mMessagesDatabaseReference = mRootDatabaseReference.child("message");
+    private DatabaseReference mChatsDatabaseReference = mRootDatabaseReference.child(RemoteConfig.CHAT);
+    private DatabaseReference mMessagesDatabaseReference = mRootDatabaseReference.child(RemoteConfig.MESSAGE);
     private ChildEventListener mChildEventListener;
 
-    private Uri mCurrentPhotoPath;
+    // file can be photo, video or audio
+    private Uri mCurrentFilePath;
 
-    private Uri mCurrentVideoPath;
-
-    private Uri mCurrentAudioPath;
+    private static final int PLACE_PICKER_REQUEST = 123;
 
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
 
@@ -98,6 +104,8 @@ public class ChatActivity extends AppCompatActivity {
 
     private static final int RC_AUDIO_CAPTURE = 5;
 
+    private File mLocalStorageDir;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,9 +113,13 @@ public class ChatActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_chat);
 
+        mAuthService = new AuthServiceImpl();
+
+        mLocalStorageDir = getExternalFilesDir(Environment.DIRECTORY_DCIM);
+
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseStorage = FirebaseStorage.getInstance();
-        mChatPhotosStorageReference = mFirebaseStorage.getReference().child("chat_photos");
+        mChatPhotosStorageReference = mFirebaseStorage.getReference().child(RemoteConfig.PHOTO_STORAGE);
         // Initialize references to views
         mProgressBar = (ProgressBar) findViewById(R.id.chatMessagesProgressBar);
         mMessageEditText = (EditText) findViewById(R.id.chatMessageField);
@@ -116,18 +128,16 @@ public class ChatActivity extends AppCompatActivity {
         mPhotoPickerButton = (ImageButton) findViewById(R.id.photoPickerButton);
         mCameraButton = (Button) findViewById(R.id.btnCamera);
         mCameraVideoButton = (Button) findViewById(R.id.btnCameraVideo);
-        mMapButton = (Button)findViewById(R.id.btnMap);
-        mSoundRecordingButton = (Button)findViewById(R.id.btnSoundRecording);
+        mMapButton = (Button) findViewById(R.id.btnMap);
+        mSoundRecordingButton = (Button) findViewById(R.id.btnSoundRecording);
 
         // Initialize message ListView and its adapter
         List<Message> messages = new ArrayList<>();
-        mMessageAdapter = new ChatMessageListAdapter(this, R.layout.item_chat_message, messages);
+        mMessageAdapter = new ChatMessageListAdapter(this, R.layout.item_chat_message_friend, messages);
         mMessagesListView.setAdapter(mMessageAdapter);
 
         // Initialize progress bar
         mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-
-        // Enable Send button when there's text to send
 
         mMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,11 +153,8 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (charSequence.toString().trim().length() > 0) {
-                    mSendMessageButton.setEnabled(true);
-                } else {
-                    mSendMessageButton.setEnabled(false);
-                }
+                // Enable Send button when there's text to send
+                mSendMessageButton.setEnabled(charSequence.toString().trim().length() > 0);
             }
 
             @Override
@@ -161,7 +168,7 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 String messageContent = mMessageEditText.getText().toString();
-                Message message = new Message(MessageType.TEXT, messageContent, mFirebaseAuth.getCurrentUser().getUid(), null, new Date());
+                Message message = new Message(MessageType.TEXT, messageContent, mAuthService.getUserId(), null, new Date());
 
                 String id = mMessagesDatabaseReference.push().getKey();
                 mMessagesDatabaseReference.child(id).setValue(message);
@@ -183,7 +190,7 @@ public class ChatActivity extends AppCompatActivity {
         mCameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dispatchTakePictureIntent();
+                dispatchTakeMediaIntent(MediaStore.ACTION_IMAGE_CAPTURE, RC_PHOTO_CAPTURE, "jpg");
             }
 
         });
@@ -191,7 +198,7 @@ public class ChatActivity extends AppCompatActivity {
         mCameraVideoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dispatchTakeVideoIntent();
+                dispatchTakeMediaIntent(MediaStore.ACTION_VIDEO_CAPTURE, RC_PHOTO_CAPTURE, "mp4");
             }
 
         });
@@ -199,7 +206,7 @@ public class ChatActivity extends AppCompatActivity {
         mSoundRecordingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dispatchTakeAudioIntent();
+                dispatchTakeMediaIntent(MediaStore.Audio.Media.RECORD_SOUND_ACTION, RC_AUDIO_CAPTURE, "mp3");
             }
 
         });
@@ -220,101 +227,46 @@ public class ChatActivity extends AppCompatActivity {
             }
         };
 
-
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(final int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == RC_AUDIO_CAPTURE && resultCode == RESULT_OK) {
+        if (resultCode != RESULT_OK) {
+            return;
+        }
 
-            Uri capturedAudioUri = mCurrentAudioPath;
+        if (requestCode == RC_AUDIO_CAPTURE ||
+                requestCode == RC_PHOTO_CAPTURE ||
+                requestCode == RC_VIDEO_CAPTURE ||
+                requestCode == RC_PHOTO_PICKER) {
 
-            // Get a reference to store file at chat_photos/<FILENAME>
-            StorageReference audioRef = mChatPhotosStorageReference.child(capturedAudioUri.getLastPathSegment());
+            Uri fileUri = requestCode == RC_PHOTO_PICKER ? data.getData() : mCurrentFilePath;
+
+            // Get a reference to store file at photos/<FILENAME>
+            StorageReference storageRef = mFirebaseStorage.getReference()
+                    .child(getStorageFolderFromRequestCode(requestCode))
+                    .child(fileUri.getLastPathSegment());
 
             // Upload file to Firebase Storage
-            audioRef.putFile(capturedAudioUri)
+            storageRef.putFile(fileUri)
                     .addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             // When the image has successfully uploaded, we get its download URL
-                            @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                            @SuppressWarnings("VisibleForTests")
+                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
 
                             // Set the download URL to the message box, so that the user can send it to the database
-                            Message message = new Message(MessageType.SOUND, downloadUrl.toString(), mFirebaseAuth.getCurrentUser().getUid(), null, new Date());
+                            Message message = new Message(getMessageTypeFromRequestCode(requestCode), downloadUrl.toString(), mAuthService.getUserId(), null, new Date());
                             mMessagesDatabaseReference.push().setValue(message);
                         }
                     });
         }
 
-
-        if (requestCode == RC_PHOTO_CAPTURE && resultCode == RESULT_OK) {
-
-            Uri capturedImageUri = mCurrentPhotoPath;
-
-            // Get a reference to store file at chat_photos/<FILENAME>
-            StorageReference photoRef = mChatPhotosStorageReference.child(capturedImageUri.getLastPathSegment());
-
-            // Upload file to Firebase Storage
-            photoRef.putFile(capturedImageUri)
-                    .addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // When the image has successfully uploaded, we get its download URL
-                            @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
-
-                            // Set the download URL to the message box, so that the user can send it to the database
-                            Message message = new Message(MessageType.PHOTO, downloadUrl.toString(), mFirebaseAuth.getCurrentUser().getUid(), null, new Date());
-                            mMessagesDatabaseReference.push().setValue(message);
-                        }
-                    });
-        }
-
-        if (requestCode == RC_VIDEO_CAPTURE && resultCode == RESULT_OK) {
-
-            Uri capturedVideoUri = mCurrentVideoPath;
-
-            // Get a reference to store file at chat_photos/<FILENAME>
-            StorageReference videoRef = mChatPhotosStorageReference.child(capturedVideoUri.getLastPathSegment());
-
-            // Upload file to Firebase Storage
-            videoRef.putFile(capturedVideoUri)
-                    .addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // When the image has successfully uploaded, we get its download URL
-                            @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
-
-                            // Set the download URL to the message box, so that the user can send it to the database
-                            Message message = new Message(MessageType.VIDEO, downloadUrl.toString(), mFirebaseAuth.getCurrentUser().getUid(), null, new Date());
-                            mMessagesDatabaseReference.push().setValue(message);
-                        }
-                    });
-        }
-
-
-        if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
-            Uri selectedImageUri = data.getData();
-
-            // Get a reference to store file at chat_photos/<FILENAME>
-            StorageReference photoRef = mChatPhotosStorageReference.child(selectedImageUri.getLastPathSegment());
-
-            // Upload file to Firebase Storage
-            photoRef.putFile(selectedImageUri)
-                    .addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // When the image has successfully uploaded, we get its download URL
-                            @SuppressWarnings("VisibleForTests") Uri downloadUrl = taskSnapshot.getDownloadUrl();
-
-                            // Set the download URL to the message box, so that the user can send it to the database
-                            Message message = new Message(MessageType.PHOTO, downloadUrl.toString(), mFirebaseAuth.getCurrentUser().getUid(), null, new Date());
-                            mMessagesDatabaseReference.push().setValue(message);
-                        }
-                    });
-        }
-
-        if (requestCode == PLACE_PICKER_REQUEST && resultCode == RESULT_OK){
+        if (requestCode == PLACE_PICKER_REQUEST) {
             Place place = PlacePicker.getPlace(this, data);
-            if (place != null){
+            if (place != null) {
                 latLng = place.getLatLng();
                 MapModel mapModel = new MapModel(latLng.latitude + "", latLng.longitude + "");
             }
@@ -327,11 +279,6 @@ public class ChatActivity extends AppCompatActivity {
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
         return Uri.parse(path);
     }
-
-
-
-
-
 
     @Override
     protected void onResume() {
@@ -390,14 +337,14 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+    private void dispatchTakeMediaIntent(String action, int requestCode, String format) {
+        Intent takeMediaIntent = new Intent(action);
         // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+        if (takeMediaIntent.resolveActivity(getPackageManager()) != null) {
             // Create the File where the photo should go
             File photoFile = null;
             try {
-                photoFile = createImageFile();
+                photoFile = FileUtils.createFile(mLocalStorageDir, format);
             } catch (IOException ex) {
                 // Error occurred while creating the File
 
@@ -405,119 +352,40 @@ public class ChatActivity extends AppCompatActivity {
             // Continue only if the File was successfully created
             if (photoFile != null) {
                 Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.pma.chat.pmaChat.fileprovider",
+                        AppUtils.FILE_PROVIDER,
                         photoFile);
-                mCurrentPhotoPath = photoURI;
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, RC_PHOTO_CAPTURE);
+                mCurrentFilePath = photoURI;
+                takeMediaIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takeMediaIntent, requestCode);
             }
         }
     }
 
-
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        return image;
-    }
-
-    private void dispatchTakeVideoIntent() {
-        Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File videoFile = null;
-            try {
-                videoFile = createVideoFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-
-            }
-            // Continue only if the File was successfully created
-            if (videoFile != null) {
-                Uri videoURI = FileProvider.getUriForFile(this,
-                        "com.pma.chat.pmaChat.fileprovider",
-                        videoFile);
-                mCurrentVideoPath = videoURI;
-                takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoURI);
-                startActivityForResult(takeVideoIntent, RC_VIDEO_CAPTURE);
-            }
-        }
-    }
-
-
-    private File createVideoFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String videoFileName = "MP4_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File video = File.createTempFile(
-                videoFileName,  /* prefix */
-                ".mp4",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        return video;
-    }
-
-    private void dispatchTakeAudioIntent() {
-        Intent takeAudioIntent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
-        // Ensure that there's a camera activity to handle the intent
-        if (takeAudioIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File audioFile = null;
-            try {
-                audioFile = createAudioFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-
-            }
-            // Continue only if the File was successfully created
-            if (audioFile != null) {
-                Uri audioURI = FileProvider.getUriForFile(this,
-                        "com.pma.chat.pmaChat.fileprovider",
-                        audioFile);
-                mCurrentAudioPath = audioURI;
-                takeAudioIntent.putExtra(MediaStore.EXTRA_OUTPUT, audioURI);
-                startActivityForResult(takeAudioIntent, RC_AUDIO_CAPTURE);
-            }
-        }
-    }
-
-
-    private File createAudioFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String audioFileName = "MP3_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File audio = File.createTempFile(
-                audioFileName,  /* prefix */
-                ".mp3",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        return audio;
-    }
-
-    private void locationPlacesIntent(){
+    private void locationPlacesIntent() {
         try {
             PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
             startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
 
         } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
             e.printStackTrace();
+        }
+    }
+
+    private String getStorageFolderFromRequestCode(int requestCode) {
+        switch(requestCode) {
+            case RC_PHOTO_CAPTURE : return RemoteConfig.PHOTO_STORAGE;
+            case RC_VIDEO_CAPTURE : return RemoteConfig.VIDEO_STORAGE;
+            case RC_AUDIO_CAPTURE : return RemoteConfig.AUDIO_STORAGE;
+            default: return "";
+        }
+    }
+
+    private MessageType getMessageTypeFromRequestCode(int requestCode) {
+        switch(requestCode) {
+            case RC_PHOTO_CAPTURE : return MessageType.PHOTO;
+            case RC_VIDEO_CAPTURE : return MessageType.VIDEO;
+            case RC_AUDIO_CAPTURE : return MessageType.SOUND;
+            default: return MessageType.TEXT;
         }
     }
 

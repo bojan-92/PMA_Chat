@@ -3,7 +3,7 @@ package com.pma.chat.pmaChat.model;
 import java.util.Calendar;
 
 
-public class UserInfo {
+public class User {
 
     private String firstName;
 
@@ -13,10 +13,10 @@ public class UserInfo {
 
   //  private Calendar birthday;
 
-    public UserInfo() {
+    public User() {
     }
 
-    public UserInfo(String firstName, String lastName, String phoneNumber, Calendar birthday) {
+    public User(String firstName, String lastName, String phoneNumber, Calendar birthday) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;

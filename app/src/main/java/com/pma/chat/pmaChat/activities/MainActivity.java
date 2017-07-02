@@ -1,4 +1,4 @@
-package com.pma.chat.pmaChat;
+package com.pma.chat.pmaChat.activities;
 
 import android.content.Intent;
 import android.support.v4.app.Fragment;
@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.adapters.DrawerListAdapter;
 import com.pma.chat.pmaChat.auth.LoginActivity;
 import com.pma.chat.pmaChat.model.NavItem;

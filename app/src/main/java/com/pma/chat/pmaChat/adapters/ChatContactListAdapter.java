@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.pma.chat.pmaChat.model.UserInfo;
+import com.pma.chat.pmaChat.model.User;
 import com.pma.chat.pmaChat.R;
 
 
@@ -82,9 +82,9 @@ class ChatContactListAdapter extends RecyclerView.Adapter<ChatContactListAdapter
             itemView.setOnClickListener(this);
         }
 
-        void bind(UserInfo userInfo) {
+        void bind(User user) {
             // profilePhotoImageView.setImage
-            nameTextView.setText(userInfo.getFirstName() + " " + userInfo.getLastName());
+            nameTextView.setText(user.getFirstName() + " " + user.getLastName());
             statusTextView.setText("Offline");
         }
 

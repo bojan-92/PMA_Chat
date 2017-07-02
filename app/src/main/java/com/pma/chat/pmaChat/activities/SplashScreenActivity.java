@@ -13,10 +13,10 @@ import com.pma.chat.pmaChat.auth.LoginActivity;
 
 public class SplashScreenActivity extends Activity {
 
-    ProgressBar progressBar;
-    int progressStatus = 0;
-    TextView textView;
-    Handler handler = new Handler();
+    private ProgressBar progressBar;
+    private int progressStatus = 0;
+    private TextView textView;
+    private Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState){

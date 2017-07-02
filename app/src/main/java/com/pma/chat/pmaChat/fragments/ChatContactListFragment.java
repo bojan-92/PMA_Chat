@@ -1,19 +1,14 @@
 package com.pma.chat.pmaChat.fragments;
 
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,26 +26,30 @@ import com.google.firebase.database.ValueEventListener;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.activities.ChatActivity;
 import com.pma.chat.pmaChat.data.PhoneContactListProvider;
-import com.pma.chat.pmaChat.model.UserInfo;
+import com.pma.chat.pmaChat.model.ChatContact;
+import com.pma.chat.pmaChat.model.PhoneContact;
+import com.pma.chat.pmaChat.model.User;
+import com.pma.chat.pmaChat.utils.RemoteConfig;
 
 import java.util.ArrayList;
+import java.util.List;
 
 //implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener
 public class ChatContactListFragment extends Fragment  {
 
     private final int REQUEST_CODE_ASK_PERMISSIONS = 123;
 
-    private ArrayList contacts;
+    private List<PhoneContact> mPhoneContacts;
 
     private DatabaseReference mRootDatabaseReference = FirebaseDatabase.getInstance().getReference();
-    private DatabaseReference mUserInfoDatabaseReference = mRootDatabaseReference.child("userInfo");
+    private DatabaseReference mUserDatabaseReference = mRootDatabaseReference.child(RemoteConfig.USER);
 
     private ProgressBar mProgressBar;
 
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, Bundle savedInstanceState) {
 
         final ChatContactListFragment fragment = this;
 
@@ -60,23 +59,35 @@ public class ChatContactListFragment extends Fragment  {
 
         readContactsWrapper();
 
-        mUserInfoDatabaseReference.addValueEventListener(new ValueEventListener() {
+        mUserDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
+                if(mPhoneContacts == null) return;
+
+                ArrayList<String> phoneNumbers = new ArrayList<>();
+
+                for(PhoneContact phoneContact : mPhoneContacts) {
+                    String phoneNumber = phoneContact.getPhoneNumber().replace("(", "").replace(")", "").replace("-", "").replace(" ", "");
+                    phoneNumbers.add(phoneNumber);
+                }
+
                 mProgressBar.setVisibility(ProgressBar.VISIBLE);
 
-                ArrayList<String> users = new ArrayList<>();
+                ArrayList<String> chatContacts = new ArrayList<>();
 
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    users.add(data.getValue(UserInfo.class).getFirstName() + " " + data.getValue(UserInfo.class).getLastName());
+                    User user = data.getValue(User.class);
+                    if(phoneNumbers.contains(user.getPhoneNumber())) {
+                        chatContacts.add(user.getFirstName() + " " + user.getLastName());
+                    }
                 }
 
                 ArrayAdapter adapter = new ArrayAdapter(
                         fragment.getActivity(),
                         R.layout.user_list_item,
                         R.id.tv_contact_name,
-                        users);
+                        chatContacts);
 
                 ListView listView = (ListView) view.findViewById(R.id.friendsList);
                 listView.setAdapter(adapter);
@@ -157,10 +168,7 @@ public class ChatContactListFragment extends Fragment  {
 
     public void readContacts() {
         PhoneContactListProvider contactListProvider = new PhoneContactListProvider(getActivity());
-        contacts = contactListProvider.fetchAll();
-
-        Log.i("TEST", contacts.toString());
-
+        mPhoneContacts = contactListProvider.fetchAll();
     }
 
 

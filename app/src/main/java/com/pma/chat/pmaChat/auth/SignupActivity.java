@@ -5,7 +5,6 @@ import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -15,57 +14,40 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.pma.chat.pmaChat.MainActivity;
+import com.pma.chat.pmaChat.activities.MainActivity;
 import com.pma.chat.pmaChat.R;
-import com.pma.chat.pmaChat.model.UserInfo;
+import com.pma.chat.pmaChat.model.User;
 
 import java.util.Calendar;
 
 
 public class SignupActivity extends Activity {
 
-    private UserInfo userInfo;
+    private User userInfo;
 
     private Calendar calendar = Calendar.getInstance();
 
     private EditText txtFirstName;
-
     private EditText txtLastName;
-
     private EditText txtEmail;
-
     private EditText txtPassword;
-
-    private EditText txtPhoneNumber;
-
     private EditText txtPasswordConfirm;
-
-    private Button btnDatePicker;
-
+    private EditText txtPhoneNumber;
     private EditText txtSelectedDateOfBirth;
-
+    private Button btnDatePicker;
     private Button btnSignUp;
-
     private TextView tvGoToLogin;
-
     private ProgressDialog progressDialog;
 
-    private FirebaseAuth firebaseAuth;
-
-    private DatabaseReference firebaseDatabaseRef = FirebaseDatabase.getInstance().getReference();
+    private AuthService mAuthService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+
+        mAuthService = new AuthServiceImpl();
     }
 
     @Override
@@ -73,9 +55,7 @@ public class SignupActivity extends Activity {
 
         super.onStart();
 
-        firebaseAuth = FirebaseAuth.getInstance();
-
-        if(firebaseAuth.getCurrentUser() != null){
+        if(mAuthService.isUserLoggedIn()) {
             finish();
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
         }
@@ -92,7 +72,6 @@ public class SignupActivity extends Activity {
         btnDatePicker = (Button) findViewById(R.id.datePicker);
         txtSelectedDateOfBirth = (EditText) findViewById(R.id.txtSelectedDateOfBirth);
         txtSelectedDateOfBirth.setEnabled(false);
-
 
         tvGoToLogin = (TextView) findViewById(R.id.tvSignUpBackToLogin);
 
@@ -141,42 +120,23 @@ public class SignupActivity extends Activity {
                 progressDialog.setMessage("Registering User ...");
                 progressDialog.show();
 
-                userInfo = new UserInfo(firstName, lastName, phoneNumber, calendar);
+                userInfo = new User(firstName, lastName, phoneNumber, calendar);
 
-                firebaseAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-
-                                progressDialog.dismiss();
-
-                                if (task.isSuccessful()) {
-
-                                    String userId = firebaseAuth.getCurrentUser().getUid();
-                                    DatabaseReference currentUserRef = firebaseDatabaseRef.child("userInfo").child(userId);
-
-                                    currentUserRef.setValue(userInfo, new DatabaseReference.CompletionListener() {
-                                        @Override
-                                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                                            if (databaseError != null) {
-                                                Toast.makeText(SignupActivity.this, R.string.failedSavingUserInfoMessage, Toast.LENGTH_SHORT).show();
-                                            } else {
-                                                firebaseAuth.signOut();
-                                            }
-                                        }
-                                    });
-
-                                    Toast.makeText(SignupActivity.this, R.string.successfulRegistrationMessage, Toast.LENGTH_SHORT).show();
-
-                                } else {
-                                    Toast.makeText(SignupActivity.this, R.string.failedRegistrationMessage, Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
+                mAuthService.registerUser(email, password, userInfo, new    AuthCallback() {
+                    @Override
+                    public void notifyUI(boolean result) {
+                        progressDialog.dismiss();
+                        if(result) {
+                            Toast.makeText(SignupActivity.this, R.string.successfulRegistrationMessage, Toast.LENGTH_SHORT).show();
+                            finish();
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        } else {
+                            Toast.makeText(SignupActivity.this, R.string.failedRegistrationMessage, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
-
     }
 
     DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
