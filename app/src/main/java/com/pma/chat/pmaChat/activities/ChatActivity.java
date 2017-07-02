@@ -198,7 +198,7 @@ public class ChatActivity extends AppCompatActivity {
         mCameraVideoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dispatchTakeMediaIntent(MediaStore.ACTION_VIDEO_CAPTURE, RC_PHOTO_CAPTURE, "mp4");
+                dispatchTakeMediaIntent(MediaStore.ACTION_VIDEO_CAPTURE, RC_VIDEO_CAPTURE, "mp4");
             }
 
         });
