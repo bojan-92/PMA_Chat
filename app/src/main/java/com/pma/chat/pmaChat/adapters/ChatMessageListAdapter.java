@@ -21,8 +21,13 @@ import java.util.List;
 public class ChatMessageListAdapter extends ArrayAdapter<Message> {
 
     private ImageView mMessageContentImageView;
+    private ImageView mMessageArrowPhotoView;
+
     private VideoView mMessageContentVideoView;
+    private ImageView mMessageArrowVideoView;
+
     private TextView mMessageContentTextView;
+    private ImageView mMessageArrowTextView;
 
     private static final int TYPES_COUNT = 2;
     private static final int TYPE_ME = 0;
@@ -59,9 +64,13 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
         }
 
         mMessageContentImageView = (ImageView) convertView.findViewById(R.id.chat_message_photo_content);
-        mMessageContentVideoView = (VideoView) convertView.findViewById(R.id.chat_message_video_content);
-        mMessageContentTextView = (TextView) convertView.findViewById(R.id.chat_message_text_content);
+        mMessageArrowPhotoView = (ImageView) convertView.findViewById(R.id.chat_message_arrow_photo_content);
 
+        mMessageContentVideoView = (VideoView) convertView.findViewById(R.id.chat_message_video_content);
+        mMessageArrowVideoView = (ImageView) convertView.findViewById(R.id.chat_message_arrow_video_content);
+
+        mMessageContentTextView = (TextView) convertView.findViewById(R.id.chat_message_text_content);
+        mMessageArrowTextView = (ImageView) convertView.findViewById(R.id.chat_message_arrow_text_content);
       //  TextView tvMessageAuthor = (TextView) convertView.findViewById(R.id.chatMessageAuthor);
 
         Message message = getItem(position);
@@ -78,12 +87,14 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
             case TEXT:
                 hideAllContentViews();
                 mMessageContentTextView.setVisibility(View.VISIBLE);
+                mMessageArrowTextView.setVisibility(View.VISIBLE);
                 mMessageContentTextView.setText(message.getContent());
                 break;
 
             case PHOTO:
                 hideAllContentViews();
                 mMessageContentImageView.setVisibility(View.VISIBLE);
+                mMessageArrowPhotoView.setVisibility(View.VISIBLE);
                 Glide.with(mMessageContentImageView.getContext())
                         .load(message.getContent())
                         .into(mMessageContentImageView);
@@ -93,8 +104,13 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
                 hideAllContentViews();
            //     mMessageContentVideoView.setVisibility(View.VISIBLE);
            //     mMessageContentVideoView.setVideoURI(Uri.parse(message.getContent()));
-                mMessageContentTextView.setVisibility(View.VISIBLE);
-                mMessageContentTextView.setText("VIDEO: " + message.getContent());
+//                mMessageContentTextView.setVisibility(View.VISIBLE);
+//                mMessageContentTextView.setText("VIDEO: " + message.getContent());
+
+                mMessageArrowVideoView.setVisibility(View.VISIBLE);
+                mMessageContentVideoView.setVisibility(View.VISIBLE);
+                mMessageContentVideoView.setVideoURI(Uri.parse(message.getContent()));
+//                mMessageContentVideoView.start();
                 break;
 
             case SOUND:
