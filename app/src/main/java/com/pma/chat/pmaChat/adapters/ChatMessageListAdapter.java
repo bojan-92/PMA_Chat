@@ -110,7 +110,7 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
                 mMessageArrowVideoView.setVisibility(View.VISIBLE);
                 mMessageContentVideoView.setVisibility(View.VISIBLE);
                 mMessageContentVideoView.setVideoURI(Uri.parse(message.getContent()));
-//                mMessageContentVideoView.start();
+                mMessageContentVideoView.start();
                 break;
 
             case SOUND:

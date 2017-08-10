@@ -20,7 +20,7 @@
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/chat_message_arrow_photo_content"
         android:visibility="gone"
-        android:background="@drawable/message_wrapper"/>
+        android:background="@drawable/message_wrapper_friend"/>
 
     <ImageView
         android:id="@+id/chat_message_arrow_photo_content"
@@ -60,7 +60,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/chat_message_arrow_text_content"
-        android:background="@drawable/message_wrapper"
+        android:background="@drawable/message_wrapper_friend"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
         android:layout_marginRight="16dp"
