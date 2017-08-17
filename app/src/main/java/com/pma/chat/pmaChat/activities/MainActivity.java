@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.adapters.DrawerListAdapter;
+import com.pma.chat.pmaChat.adapters.StickerAdapter;
 import com.pma.chat.pmaChat.auth.LoginActivity;
 import com.pma.chat.pmaChat.model.NavItem;
 import com.pma.chat.pmaChat.data.DatabaseHelper;
@@ -70,6 +72,8 @@ public class MainActivity extends AppCompatActivity  {
         mListAdapter = new DrawerListAdapter(this, mNavItems);
         mListView.setAdapter(mListAdapter);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+
+
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

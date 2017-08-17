@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -110,7 +111,7 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
                 mMessageArrowVideoView.setVisibility(View.VISIBLE);
                 mMessageContentVideoView.setVisibility(View.VISIBLE);
                 mMessageContentVideoView.setVideoURI(Uri.parse(message.getContent()));
-//                mMessageContentVideoView.start();
+                mMessageContentVideoView.start();
                 break;
 
             case SOUND:

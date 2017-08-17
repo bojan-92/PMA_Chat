@@ -16,6 +16,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -39,6 +40,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.adapters.ChatMessageListAdapter;
+import com.pma.chat.pmaChat.adapters.StickerAdapter;
 import com.pma.chat.pmaChat.auth.AuthService;
 import com.pma.chat.pmaChat.auth.AuthServiceImpl;
 import com.pma.chat.pmaChat.auth.LoginActivity;
@@ -70,6 +72,7 @@ public class ChatActivity extends AppCompatActivity {
     private Button mCameraVideoButton;
     private Button mSoundRecordingButton;
     private ImageButton mPhotoPickerButton;
+    private Button mStickerButton;
 
     private LatLng latLng;
 
@@ -130,6 +133,7 @@ public class ChatActivity extends AppCompatActivity {
         mCameraVideoButton = (Button) findViewById(R.id.btnCameraVideo);
         mMapButton = (Button) findViewById(R.id.btnMap);
         mSoundRecordingButton = (Button) findViewById(R.id.btnSoundRecording);
+        mStickerButton = (Button) findViewById(R.id.btnStick);
 
         // Initialize message ListView and its adapter
         List<Message> messages = new ArrayList<>();
@@ -143,6 +147,13 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 locationPlacesIntent();
+            }
+        });
+
+        mStickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), StickerActivity.class));
             }
         });
 
@@ -194,6 +205,7 @@ public class ChatActivity extends AppCompatActivity {
             }
 
         });
+
 
         mCameraVideoButton.setOnClickListener(new View.OnClickListener() {
             @Override
