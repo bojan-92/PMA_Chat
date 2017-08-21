@@ -78,7 +78,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:background="@color/colorAccent"
-        android:text="@string/change_picture"
+        android:text="@string/userStartChat"
         android:textAlignment="center"
         android:textColor="#FFF" />
 

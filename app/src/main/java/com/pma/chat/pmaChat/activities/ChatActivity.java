@@ -74,6 +74,7 @@ public class ChatActivity extends AppCompatActivity {
     private ImageButton mPhotoPickerButton;
     private Button mStickerButton;
 
+
     private LatLng latLng;
 
     private ProgressBar mProgressBar;
