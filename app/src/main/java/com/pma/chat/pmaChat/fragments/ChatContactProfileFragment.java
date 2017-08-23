@@ -11,8 +11,16 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.activities.ChatActivity;
+import com.pma.chat.pmaChat.model.User;
+import com.pma.chat.pmaChat.utils.RemoteConfig;
 
 
 public class ChatContactProfileFragment extends Fragment {
@@ -24,6 +32,8 @@ public class ChatContactProfileFragment extends Fragment {
     private FirebaseAuth mFirebaseAuth;
 
 
+    private DatabaseReference mRootDatabaseReference = FirebaseDatabase.getInstance().getReference();
+    private ChildEventListener mChildEventListener;
 
     @Nullable
     @Override
@@ -33,16 +43,31 @@ public class ChatContactProfileFragment extends Fragment {
         Button chatButton = (Button) view.findViewById(R.id.chatButton);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
+        String userId = mFirebaseAuth.getCurrentUser().getUid();
+        DatabaseReference currentUserRef = mRootDatabaseReference.child(RemoteConfig.USER).child(userId);
 
         mFirstName = (TextView) view.findViewById(R.id.txtFirstName);
         mLastName = (TextView) view.findViewById(R.id.txtLastName);
         mEmail = (TextView) view.findViewById(R.id.txtSignUpEmail);
         mPhoneNumber = (TextView) view.findViewById(R.id.txtPhoneNumber);
-        mFirstName.setText("david");
-        mLastName.setText("prezime");
-        mEmail.setText(mFirebaseAuth.getCurrentUser().getEmail());
-        mPhoneNumber.setText("123");
 
+        currentUserRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                User user = dataSnapshot.getValue(User.class);
+
+                mFirstName.setText("First name: " + user.getFirstName());
+                mLastName.setText("Last name: " +user.getLastName());
+                mEmail.setText("Email: " + mFirebaseAuth.getCurrentUser().getEmail());
+                mPhoneNumber.setText("Number: " +user.getPhoneNumber());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         chatButton.setOnClickListener(new View.OnClickListener() {
             @Override

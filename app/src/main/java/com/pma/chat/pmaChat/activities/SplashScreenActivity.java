@@ -2,6 +2,8 @@ package com.pma.chat.pmaChat.activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.ProgressBar;
@@ -24,6 +26,8 @@ public class SplashScreenActivity extends Activity {
         setContentView(R.layout.activity_splash_screen);
         textView = (TextView)findViewById(R.id.load_per);
         progressBar = (ProgressBar)findViewById(R.id.pb_splash_screen);
+        progressBar.getProgressDrawable().setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN);
+        progressBar.setScaleY(2f);
 
         new Thread(new Runnable() {
             public void run() {

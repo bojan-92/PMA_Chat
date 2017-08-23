@@ -129,10 +129,10 @@ public class MainActivity extends AppCompatActivity  {
      * @param mNavItems The list of items in the navigation drawer.
      */
     private void initDrawerListItems(List<NavItem> mNavItems ){
-        mNavItems.add(new NavItem(getString(R.string.friendsList), R.drawable.ic_accessibility_black_24px));
-        mNavItems.add(new NavItem(getString(R.string.edit_profile_settings), R.drawable.ic_settings_black_24px));
-        mNavItems.add(new NavItem(getString(R.string.myProfile), R.drawable.ic_account_circle_black_24px));
-        mNavItems.add(new NavItem(getString(R.string.logout), R.drawable.ic_exit_to_app_black_24px));
+        mNavItems.add(new NavItem(getString(R.string.friendsList), R.drawable.ic_startchat));
+        mNavItems.add(new NavItem(getString(R.string.edit_profile_settings), R.drawable.ic_settings));
+        mNavItems.add(new NavItem(getString(R.string.myProfile), R.drawable.ic_avatar));
+        mNavItems.add(new NavItem(getString(R.string.logout), R.drawable.ic_cancel));
 
     }
 

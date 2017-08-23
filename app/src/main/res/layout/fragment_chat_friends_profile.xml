@@ -8,8 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="@color/colorAccent"
-        android:contextClickable="true"
-        android:paddingTop="20dp"
+        android:gravity="center_vertical"
         android:text="@string/userTitle"
         android:textAlignment="center"
         android:textColor="#FFF" />
@@ -21,7 +20,7 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/usersTop"
         android:background="@color/colorPrimaryDark"
-        android:src="@drawable/friend_details" />
+        android:src="@drawable/ic_android_logo" />
 
     <TextView
         android:id="@+id/txtFirstName"

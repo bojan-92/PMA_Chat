@@ -9,7 +9,7 @@
         android:layout_height="50dp"
         android:background="@color/colorAccent"
         android:contextClickable="true"
-        android:paddingTop="20dp"
+        android:gravity="center_vertical"
         android:text="@string/userTitle"
         android:textAlignment="center"
         android:textColor="#FFF" />
@@ -21,7 +21,7 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/usersTop"
         android:background="@color/colorPrimaryDark"
-        android:src="@drawable/friend_details" />
+        android:src="@drawable/ic_android_logo" />
 
     <TextView
         android:id="@+id/txtFirstName"
@@ -33,6 +33,7 @@
         android:ems="10"
         android:hint="@string/firstName"
         android:padding="5dp"
+        android:textAlignment="center"
         android:inputType="text" />
 
     <TextView
@@ -45,6 +46,7 @@
         android:ems="10"
         android:hint="@string/lastName"
         android:padding="5dp"
+        android:textAlignment="center"
         android:inputType="text" />
 
     <TextView
@@ -57,6 +59,7 @@
         android:ems="10"
         android:hint="@string/loginEmail"
         android:padding="5dp"
+        android:textAlignment="center"
         android:inputType="textEmailAddress" />
 
     <TextView
@@ -69,6 +72,7 @@
         android:ems="10"
         android:padding="5dp"
         android:hint="phone"
+        android:textAlignment="center"
         android:inputType="phone" />
 
     <Button

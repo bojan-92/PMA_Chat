@@ -1,15 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical">
 
+    <ImageView
+        android:id="@+id/chat_profile_image"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="16dp"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/user_pacific" />
+
     <TextView
         android:id="@+id/tv_contact_name"
-        android:layout_width="0px"
+        android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:layout_weight="0.9"
-        android:layout_gravity="center_vertical|center_horizontal"
-        android:gravity="center_vertical|center_horizontal" />
+        android:layout_marginRight="16dp"
+        android:gravity="center_vertical"
+        android:layout_toEndOf="@+id/chat_profile_image"
+        android:layout_alignBottom="@+id/chat_profile_image"
+        android:layout_alignTop="@+id/chat_profile_image" />
 
-</LinearLayout>
+</RelativeLayout>

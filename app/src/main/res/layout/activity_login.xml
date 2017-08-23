@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+
     <TextView
         android:id="@+id/loginHeader"
         android:layout_width="match_parent"
@@ -17,12 +18,21 @@
         android:textColor="#FFF"
         android:textSize="22sp" />
 
+    <ImageView
+        android:id="@+id/loginPicture"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@+id/loginHeader"
+        android:background="@color/colorPrimaryDark"
+        android:src="@drawable/ic_login"/>
+
+
     <EditText
         android:id="@+id/loginEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/loginHeader"
+        android:layout_below="@+id/loginPicture"
         android:layout_marginTop="19dp"
         android:hint="@string/loginEmail"
         android:inputType="textEmailAddress" />
@@ -37,25 +47,39 @@
         android:hint="@string/loginPassword"
         android:inputType="textPassword" />
 
+
     <Button
         android:id="@+id/loginBtn"
-        style="@style/Widget.AppCompat.Button.Colored"
+        android:textColor="#FFF"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/tvGoToSignUp"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:background="@color/colorAccent"
-        android:text="@string/login"
-        android:textColor="#FFF" />
+        android:text="@string/login" />
+
+    <!--<TextView-->
+        <!--android:id="@+id/tvGoToSignUp"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignStart="@+id/loginBtn"-->
+        <!--android:layout_below="@+id/loginBtn"-->
+        <!--android:layout_marginTop="25px"-->
+        <!--android:text="@string/loginGoToSignUp"-->
+        <!--android:textAlignment="center" />-->
+
+
 
     <TextView
         android:id="@+id/tvGoToSignUp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/loginBtn"
-        android:layout_below="@+id/loginBtn"
-        android:layout_marginTop="25px"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:text="@string/loginGoToSignUp"
-        android:textAlignment="center" />
+        android:textAlignment="center"
+        />
 
 </RelativeLayout>

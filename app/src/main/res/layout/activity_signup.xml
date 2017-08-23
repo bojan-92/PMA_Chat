@@ -102,6 +102,7 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/txtSelectedDateOfBirth"
         android:ems="10"
+        android:hint="Number for ex: 0643332211"
         android:inputType="phone" />
 
     <Button
