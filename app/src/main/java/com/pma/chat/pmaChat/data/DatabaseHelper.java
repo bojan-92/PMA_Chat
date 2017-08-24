@@ -10,15 +10,27 @@ import com.pma.chat.pmaChat.data.MessageContract.MessageEntry;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    // name of the database file for your application -- change to something appropriate for your app
+    private static DatabaseHelper sInstance;
+
     private static final String DATABASE_NAME = "pmaChat.db";
-    // any time you make changes to your database objects, you may have to increase the database version
     private static final int DATABASE_VERSION = 1;
+
+    public static synchronized DatabaseHelper getInstance(Context context) {
+        // Use the application context, which will ensure that we
+        // don't accidentally leak an Activity's context.
+        if (sInstance == null) {
+            sInstance = new DatabaseHelper(context.getApplicationContext());
+        }
+        return sInstance;
+    }
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
     }
 
+    // Called when the database is created for the FIRST time.
+    // If a database already exists on disk with the same DATABASE_NAME, this method will NOT be called.
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
@@ -43,6 +55,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(SQL_CREATE_MESSAGE_TABLE);
     }
 
+    // Called when the database needs to be upgraded.
+    // This method will only be called if a database already exists on disk with the same DATABASE_NAME,
+    // but the DATABASE_VERSION is different than the version of the database that exists on disk.
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ChatContactEntry.TABLE_NAME);
