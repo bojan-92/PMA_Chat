@@ -32,6 +32,7 @@
         android:layout_below="@+id/imageViewProfile"
         android:layout_marginTop="19dp"
         android:ems="10"
+        android:text=""
         android:hint="@string/firstName"
         android:inputType="text" />
 
@@ -43,6 +44,7 @@
         android:layout_below="@+id/txtProfileSettingsFirstName"
         android:layout_marginTop="11dp"
         android:ems="10"
+        android:text=""
         android:hint="@string/lastName"
         android:inputType="text" />
 
