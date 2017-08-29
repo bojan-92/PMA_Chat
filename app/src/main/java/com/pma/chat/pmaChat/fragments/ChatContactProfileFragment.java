@@ -1,13 +1,17 @@
 package com.pma.chat.pmaChat.fragments;
 
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,12 +22,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.pma.chat.pmaChat.R;
-import com.pma.chat.pmaChat.activities.ChatActivity;
 import com.pma.chat.pmaChat.model.User;
 import com.pma.chat.pmaChat.utils.RemoteConfig;
 
+import java.io.File;
 
 public class ChatContactProfileFragment extends Fragment {
+
+    private static int GALLERY_CODE = 1;
+
+    Button cpBtn;
+    ImageView ivProfile;
+
 
     private TextView mFirstName;
     private TextView mLastName;
@@ -40,7 +50,7 @@ public class ChatContactProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_chat_contact_profile, container, false);
-        Button chatButton = (Button) view.findViewById(R.id.chatButton);
+        //Button changePictureButton = (Button) view.findViewById(R.id.chatButton);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         String userId = mFirebaseAuth.getCurrentUser().getUid();
@@ -50,6 +60,9 @@ public class ChatContactProfileFragment extends Fragment {
         mLastName = (TextView) view.findViewById(R.id.txtLastName);
         mEmail = (TextView) view.findViewById(R.id.txtSignUpEmail);
         mPhoneNumber = (TextView) view.findViewById(R.id.txtPhoneNumber);
+
+        cpBtn  = (Button) view.findViewById(R.id.changePictureButton);
+        ivProfile  = (ImageView) view.findViewById(R.id.imageViewProfile);
 
         currentUserRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -69,17 +82,29 @@ public class ChatContactProfileFragment extends Fragment {
             }
         });
 
-        chatButton.setOnClickListener(new View.OnClickListener() {
+        cpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(view.getContext(), ChatActivity.class);
-                startActivity(i);
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/jpeg");
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                startActivityForResult(Intent.createChooser(intent, "Complete action using"), GALLERY_CODE);
             }
         });
-        return view;
 
+
+        return view;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == GALLERY_CODE && null != data) {
+            Uri selectedImage = data.getData();
+            ivProfile.setImageURI(selectedImage);
+        }
+    }
 
 
 }

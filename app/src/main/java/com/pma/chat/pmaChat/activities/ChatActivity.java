@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -108,6 +109,8 @@ public class ChatActivity extends AppCompatActivity {
 
     private static final int RC_AUDIO_CAPTURE = 5;
 
+    private static final int STICKER_RECEIVED = 15;
+
     private File mLocalStorageDir;
 
 
@@ -154,7 +157,7 @@ public class ChatActivity extends AppCompatActivity {
         mStickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), StickerActivity.class));
+                startActivityForResult(new Intent(getApplicationContext(), StickerActivity.class), STICKER_RECEIVED);
             }
         });
 
@@ -248,6 +251,20 @@ public class ChatActivity extends AppCompatActivity {
 
         if (resultCode != RESULT_OK) {
             return;
+        }
+
+        if (requestCode == STICKER_RECEIVED) {
+            Integer stickerDrawableId = data.getExtras().getInt("stickerId");
+            /* OVAJ ID JE U SUSTINI ID DRAWABLE-a STICKERA
+               NPR.  R.drawable.ic_cat
+
+               ImageView imageView = new ImageView(context);
+               imageView.setImageResource(stickerDrawableId);
+            * */
+
+            // TODO: NAPRAVITI SLIKU SA OVIM ID-JEM, TO CE BITI STICKER KOJI SE TRAZI.
+            // UBACITI TU SLIKU U CHAT PORUKU.
+            Log.d("ChatActivity", "Sticker je izabran, njegov ID je: " + stickerDrawableId);
         }
 
         if (requestCode == RC_AUDIO_CAPTURE ||
