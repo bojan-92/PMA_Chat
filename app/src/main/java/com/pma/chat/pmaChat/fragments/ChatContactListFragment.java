@@ -25,10 +25,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.activities.ChatActivity;
+import com.pma.chat.pmaChat.data.DatabaseHelper;
 import com.pma.chat.pmaChat.data.PhoneContactListProvider;
 import com.pma.chat.pmaChat.model.ChatContact;
 import com.pma.chat.pmaChat.model.PhoneContact;
 import com.pma.chat.pmaChat.model.User;
+import com.pma.chat.pmaChat.utils.Converters;
 import com.pma.chat.pmaChat.utils.RemoteConfig;
 
 import java.util.ArrayList;
@@ -59,6 +61,24 @@ public class ChatContactListFragment extends Fragment  {
 
         readContactsWrapper();
 
+        DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
+
+        connectedRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                boolean connected = snapshot.getValue(Boolean.class);
+                if (connected) {
+                    Toast.makeText(getActivity(), "Connected", Toast.LENGTH_LONG);
+                } else {
+                    Toast.makeText(getActivity(), "Not connected", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+            }
+        });
+
         mUserDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -66,6 +86,7 @@ public class ChatContactListFragment extends Fragment  {
                 if(mPhoneContacts == null) return;
 
                 ArrayList<String> phoneNumbers = new ArrayList<>();
+
 
                 for(PhoneContact phoneContact : mPhoneContacts) {
                     String phoneNumber = phoneContact.getPhoneNumber().replace("(", "").replace(")", "").replace("-", "").replace(" ", "");
@@ -76,10 +97,13 @@ public class ChatContactListFragment extends Fragment  {
 
                 ArrayList<String> chatContacts = new ArrayList<>();
 
+                DatabaseHelper databaseHelper = DatabaseHelper.getInstance(getActivity().getApplicationContext());
+
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     User user = data.getValue(User.class);
                     if(phoneNumbers.contains(user.getPhoneNumber())) {
                         chatContacts.add(user.getFirstName() + " " + user.getLastName());
+                        databaseHelper.addOrUpdateChatContact(Converters.userToChatContact(user));
                     }
                 }
 
@@ -106,7 +130,8 @@ public class ChatContactListFragment extends Fragment  {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Toast.makeText(getActivity(), "Server error", Toast.LENGTH_SHORT)
+                        .show();
             }
         });
 

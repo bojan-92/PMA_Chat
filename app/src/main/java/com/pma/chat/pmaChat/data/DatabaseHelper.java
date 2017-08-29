@@ -1,11 +1,18 @@
 package com.pma.chat.pmaChat.data;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.pma.chat.pmaChat.data.ChatContactContract.ChatContactEntry;
 import com.pma.chat.pmaChat.data.MessageContract.MessageEntry;
+import com.pma.chat.pmaChat.model.ChatContact;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -63,6 +70,81 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ChatContactEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MessageEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
+    }
+
+    public long addOrUpdateChatContact(ChatContact chatContact) {
+        // The database connection is cached so it's not expensive to call getWriteableDatabase() multiple times.
+        SQLiteDatabase db = getWritableDatabase();
+        long userId = -1;
+
+        db.beginTransaction();
+        try {
+            ContentValues values = new ContentValues();
+            values.put(ChatContactEntry.COLUMN_NAME, chatContact.getName());
+            values.put(ChatContactEntry.COLUMN_NUMBER, chatContact.getPhoneNumber());
+
+            // First try to update the user in case the user already exists in the database
+            // This assumes phoneNumber are unique
+            int rows = db.update(ChatContactEntry.TABLE_NAME, values, ChatContactEntry.COLUMN_NUMBER + "= ?", new String[]{chatContact.getPhoneNumber()});
+
+            // Check if update succeeded
+            if (rows == 1) {
+                // Get the primary key of the user we just updated
+                String contactsSelectQuery = String.format("SELECT %s FROM %s WHERE %s = ?",
+                        ChatContactEntry._ID, ChatContactEntry.TABLE_NAME, ChatContactEntry.COLUMN_NUMBER);
+                Cursor cursor = db.rawQuery(contactsSelectQuery, new String[]{String.valueOf(chatContact.getPhoneNumber())});
+                try {
+                    if (cursor.moveToFirst()) {
+                        userId = cursor.getInt(0);
+                        db.setTransactionSuccessful();
+                    }
+                } finally {
+                    if (cursor != null && !cursor.isClosed()) {
+                        cursor.close();
+                    }
+                }
+            } else {
+                // user with this userName did not already exist, so insert new user
+                userId = db.insertOrThrow(ChatContactEntry.TABLE_NAME, null, values);
+                db.setTransactionSuccessful();
+            }
+        } catch (Exception e) {
+           // Log.d(TAG, "Error while trying to add or update user");
+        } finally {
+            db.endTransaction();
+        }
+        return userId;
+    }
+
+    public List<ChatContact> getAllChatContacts() {
+
+        List<ChatContact> chatContacts = new ArrayList<>();
+
+        String SELECT_QUERY =
+                String.format("SELECT * FROM %s", ChatContactEntry.TABLE_NAME);
+
+        // "getReadableDatabase()" and "getWriteableDatabase()" return the same object (except under low disk space scenarios)
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery(SELECT_QUERY, null);
+
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    ChatContact newContact = new ChatContact();
+                    newContact.setName(cursor.getString(cursor.getColumnIndex(ChatContactEntry.COLUMN_NAME)));
+                    newContact.setPhoneNumber(cursor.getString(cursor.getColumnIndex(ChatContactEntry.COLUMN_NUMBER)));
+                    chatContacts.add(newContact);
+                } while(cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            //Log.d(TAG, "Error while trying to get posts from database");
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+
+        return chatContacts;
     }
 
 }
