@@ -12,5 +12,7 @@ public class ChatContactContract {
 
         public static final String COLUMN_NUMBER = "phoneNumber";
 
+        public static final String COLUMN_FIREBASE_USER_ID = "firebaseUserId";
+
     }
 }

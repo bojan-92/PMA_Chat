@@ -22,6 +22,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -75,7 +76,6 @@ public class ChatActivity extends AppCompatActivity {
     private ImageButton mPhotoPickerButton;
     private Button mStickerButton;
 
-
     private LatLng latLng;
 
     private ProgressBar mProgressBar;
@@ -93,6 +93,8 @@ public class ChatActivity extends AppCompatActivity {
     private DatabaseReference mChatsDatabaseReference = mRootDatabaseReference.child(RemoteConfig.CHAT);
     private DatabaseReference mMessagesDatabaseReference = mRootDatabaseReference.child(RemoteConfig.MESSAGE);
     private ChildEventListener mChildEventListener;
+
+    private String mChatContactFirebaseUserId;
 
     // file can be photo, video or audio
     private Uri mCurrentFilePath;
@@ -119,6 +121,9 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_chat);
+
+        Intent intent = getIntent();
+        mChatContactFirebaseUserId = intent.getStringExtra("CHAT_CONTACT_FIREBASE_USER_ID");
 
         mAuthService = new AuthServiceImpl();
 

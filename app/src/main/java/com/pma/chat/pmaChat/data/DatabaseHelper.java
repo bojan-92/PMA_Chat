@@ -45,7 +45,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "CREATE TABLE " + ChatContactEntry.TABLE_NAME + " (" +
                         ChatContactEntry._ID            + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         ChatContactEntry.COLUMN_NAME    + " TEXT NOT NULL, " +
-                        ChatContactEntry.COLUMN_NUMBER  + " TEXT NOT NULL )" ;
+                        ChatContactEntry.COLUMN_NUMBER  + " TEXT NOT NULL, " +
+                        ChatContactEntry.COLUMN_FIREBASE_USER_ID  + " TEXT NOT NULL )";
 
         final String SQL_CREATE_MESSAGE_TABLE =
                 "CREATE TABLE " + MessageEntry.TABLE_NAME + " (" +
@@ -82,6 +83,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(ChatContactEntry.COLUMN_NAME, chatContact.getName());
             values.put(ChatContactEntry.COLUMN_NUMBER, chatContact.getPhoneNumber());
+            values.put(ChatContactEntry.COLUMN_FIREBASE_USER_ID, chatContact.getFirebaseUserId());
 
             // First try to update the user in case the user already exists in the database
             // This assumes phoneNumber are unique
@@ -133,6 +135,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     ChatContact newContact = new ChatContact();
                     newContact.setName(cursor.getString(cursor.getColumnIndex(ChatContactEntry.COLUMN_NAME)));
                     newContact.setPhoneNumber(cursor.getString(cursor.getColumnIndex(ChatContactEntry.COLUMN_NUMBER)));
+                    newContact.setFirebaseUserId(cursor.getString(cursor.getColumnIndex(ChatContactEntry.COLUMN_FIREBASE_USER_ID)));
                     chatContacts.add(newContact);
                 } while(cursor.moveToNext());
             }
@@ -145,6 +148,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return chatContacts;
+    }
+
+    public Cursor getAllChatContactsCursor() {
+
+        String SELECT_QUERY =
+                String.format("SELECT * FROM %s", ChatContactEntry.TABLE_NAME);
+
+        // "getReadableDatabase()" and "getWriteableDatabase()" return the same object (except under low disk space scenarios)
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery(SELECT_QUERY, null);
+
+        return cursor;
     }
 
 }
