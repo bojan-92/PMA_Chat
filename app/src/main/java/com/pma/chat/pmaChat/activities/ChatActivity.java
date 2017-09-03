@@ -187,7 +187,6 @@ public class ChatActivity extends AppCompatActivity {
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-
                         }
                     };
                     findChatQuery2.addListenerForSingleValueEvent(findChatQuery2ValueEventListener);
@@ -196,7 +195,6 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         };
         findChatQuery1.addListenerForSingleValueEvent(findChatQuery1ValueEventListener);
@@ -261,16 +259,13 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View view) {
                 dispatchTakeMediaIntent(MediaStore.ACTION_IMAGE_CAPTURE, RC_PHOTO_CAPTURE, "jpg");
             }
-
         });
-
 
         mCameraVideoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dispatchTakeMediaIntent(MediaStore.ACTION_VIDEO_CAPTURE, RC_VIDEO_CAPTURE, "mp4");
             }
-
         });
 
         mSoundRecordingButton.setOnClickListener(new View.OnClickListener() {
@@ -278,7 +273,6 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View view) {
                 dispatchTakeMediaIntent(MediaStore.Audio.Media.RECORD_SOUND_ACTION, RC_AUDIO_CAPTURE, "mp3");
             }
-
         });
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
@@ -343,7 +337,9 @@ public class ChatActivity extends AppCompatActivity {
 
                             // Set the download URL to the message box, so that the user can send it to the database
                             Message message = new Message(getMessageTypeFromRequestCode(requestCode), downloadUrl.toString(), mAuthService.getUserId(), null, new Date());
-                            mMessagesDatabaseReference.push().setValue(message);
+
+                            String id = mMessagesDatabaseReference.push().getKey();
+                            mMessagesDatabaseReference.child(id).setValue(message);
                         }
                     });
         }
@@ -368,6 +364,7 @@ public class ChatActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+        attachDatabaseReadListenerForMessages();
     }
 
     @Override
@@ -377,7 +374,7 @@ public class ChatActivity extends AppCompatActivity {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
         mMessageAdapter.clear();
-        detachDatabaseReadListener();
+        detachDatabaseReadListenerForMessages();
     }
 
     private void onSignedInInitialize(String username) {
@@ -385,10 +382,11 @@ public class ChatActivity extends AppCompatActivity {
 
     private void onSignedOutCleanup() {
         mMessageAdapter.clear();
-        detachDatabaseReadListener();
+        detachDatabaseReadListenerForMessages();
     }
 
     private void attachDatabaseReadListenerForMessages() {
+        if(mChatDatabaseReference == null) return;
         mMessagesDatabaseReference = mChatDatabaseReference.child(RemoteConfig.MESSAGE);
         if (mChildEventListener == null) {
             mChildEventListener = new ChildEventListener() {
@@ -414,7 +412,7 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    private void detachDatabaseReadListener() {
+    private void detachDatabaseReadListenerForMessages() {
         if (mChildEventListener != null) {
             mMessagesDatabaseReference.removeEventListener(mChildEventListener);
             mChildEventListener = null;
@@ -426,20 +424,20 @@ public class ChatActivity extends AppCompatActivity {
         // Ensure that there's a camera activity to handle the intent
         if (takeMediaIntent.resolveActivity(getPackageManager()) != null) {
             // Create the File where the photo should go
-            File photoFile = null;
+            File file = null;
             try {
-                photoFile = FileUtils.createFile(mLocalStorageDir, format);
+                file = FileUtils.createFile(mLocalStorageDir, format);
             } catch (IOException ex) {
                 // Error occurred while creating the File
 
             }
             // Continue only if the File was successfully created
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,
+            if (file != null) {
+                Uri fileURI = FileProvider.getUriForFile(this,
                         AppUtils.FILE_PROVIDER,
-                        photoFile);
-                mCurrentFilePath = photoURI;
-                takeMediaIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                        file);
+                mCurrentFilePath = fileURI;
+                takeMediaIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileURI);
                 startActivityForResult(takeMediaIntent, requestCode);
             }
         }
