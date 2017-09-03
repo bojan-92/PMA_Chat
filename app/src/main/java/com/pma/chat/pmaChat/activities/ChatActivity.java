@@ -37,6 +37,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -46,6 +48,7 @@ import com.pma.chat.pmaChat.adapters.StickerAdapter;
 import com.pma.chat.pmaChat.auth.AuthService;
 import com.pma.chat.pmaChat.auth.AuthServiceImpl;
 import com.pma.chat.pmaChat.auth.LoginActivity;
+import com.pma.chat.pmaChat.model.Chat;
 import com.pma.chat.pmaChat.model.MapModel;
 import com.pma.chat.pmaChat.model.Message;
 import com.pma.chat.pmaChat.model.MessageType;
@@ -58,6 +61,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -91,7 +95,8 @@ public class ChatActivity extends AppCompatActivity {
 
     private DatabaseReference mRootDatabaseReference = FirebaseDatabase.getInstance().getReference();
     private DatabaseReference mChatsDatabaseReference = mRootDatabaseReference.child(RemoteConfig.CHAT);
-    private DatabaseReference mMessagesDatabaseReference = mRootDatabaseReference.child(RemoteConfig.MESSAGE);
+    private DatabaseReference mChatDatabaseReference;
+    private DatabaseReference mMessagesDatabaseReference;
     private ChildEventListener mChildEventListener;
 
     private String mChatContactFirebaseUserId;
@@ -126,10 +131,9 @@ public class ChatActivity extends AppCompatActivity {
         mChatContactFirebaseUserId = intent.getStringExtra("CHAT_CONTACT_FIREBASE_USER_ID");
 
         mAuthService = new AuthServiceImpl();
+        mFirebaseAuth = FirebaseAuth.getInstance();
 
         mLocalStorageDir = getExternalFilesDir(Environment.DIRECTORY_DCIM);
-
-        mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseStorage = FirebaseStorage.getInstance();
         mChatPhotosStorageReference = mFirebaseStorage.getReference().child(RemoteConfig.PHOTO_STORAGE);
         // Initialize references to views
@@ -151,6 +155,51 @@ public class ChatActivity extends AppCompatActivity {
 
         // Initialize progress bar
         mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+
+        final String userId = mFirebaseAuth.getCurrentUser().getUid();
+
+        final Query findChatQuery1 = mChatsDatabaseReference.orderByChild(RemoteConfig.CHAT_UNIQUE_MARK).equalTo(userId + "_" + mChatContactFirebaseUserId);
+        final Query findChatQuery2 = mChatsDatabaseReference.orderByChild(RemoteConfig.CHAT_UNIQUE_MARK).equalTo(mChatContactFirebaseUserId + "_" + userId);
+
+        ValueEventListener findChatQuery1ValueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterator<DataSnapshot> dataIterator = dataSnapshot.getChildren().iterator();
+                if(dataIterator.hasNext()) {
+                    mChatDatabaseReference = dataIterator.next().getRef();
+                    attachDatabaseReadListenerForMessages();
+                } else {
+                    //String key = dataSnapshot.getKey();
+                    ValueEventListener findChatQuery2ValueEventListener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Iterator<DataSnapshot> dataIterator = dataSnapshot.getChildren().iterator();
+                            if(dataIterator.hasNext()) {
+                                mChatDatabaseReference = dataIterator.next().getRef();
+                                attachDatabaseReadListenerForMessages();
+                            } else {
+                                String chatKey = mChatsDatabaseReference.push().getKey();
+                                mChatDatabaseReference = mChatsDatabaseReference.child(chatKey);
+                                mChatDatabaseReference.child(RemoteConfig.CHAT_UNIQUE_MARK).setValue(userId + "_" + mChatContactFirebaseUserId);
+                                attachDatabaseReadListenerForMessages();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    };
+                    findChatQuery2.addListenerForSingleValueEvent(findChatQuery2ValueEventListener);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        findChatQuery1.addListenerForSingleValueEvent(findChatQuery1ValueEventListener);
 
         mMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -332,7 +381,6 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void onSignedInInitialize(String username) {
-        attachDatabaseReadListener();
     }
 
     private void onSignedOutCleanup() {
@@ -340,7 +388,8 @@ public class ChatActivity extends AppCompatActivity {
         detachDatabaseReadListener();
     }
 
-    private void attachDatabaseReadListener() {
+    private void attachDatabaseReadListenerForMessages() {
+        mMessagesDatabaseReference = mChatDatabaseReference.child(RemoteConfig.MESSAGE);
         if (mChildEventListener == null) {
             mChildEventListener = new ChildEventListener() {
                 @Override
