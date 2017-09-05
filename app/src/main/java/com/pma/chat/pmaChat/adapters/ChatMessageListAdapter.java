@@ -2,10 +2,14 @@ package com.pma.chat.pmaChat.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.TextView;
@@ -34,10 +38,13 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
     private static final int TYPE_ME = 0;
     private static final int TYPE_FRIEND = 1;
 
+    private Context mContext;
+
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
     public ChatMessageListAdapter(Context context, int resource, List<Message> objects) {
         super(context, resource, objects);
+        mContext = context;
     }
 
     @Override
@@ -125,6 +132,24 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
 
                 break;
 
+            case STICKER:
+                hideAllContentViews();
+                mMessageContentImageView.setVisibility(View.VISIBLE);
+              //  mMessageArrowPhotoView.setVisibility(View.VISIBLE);
+                Resources resources = convertView.getContext().getApplicationContext().getResources();
+                final int resourceId = resources.getIdentifier(message.getContent(), "drawable",
+                        convertView.getContext().getApplicationContext().getApplicationContext().getPackageName());
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+
+                mMessageContentImageView.setImageResource(resourceId);
+                ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) mMessageContentImageView.getLayoutParams();
+                params.width = 200;
+                params.height = 200;
+                mMessageContentImageView.setLayoutParams(params);
+
+                break;
+
         }
         //   tvMessageAuthor.setText(message.getSenderId().ge);
 
@@ -135,5 +160,47 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
         mMessageContentTextView.setVisibility(View.GONE);
         mMessageContentImageView.setVisibility(View.GONE);
         mMessageContentVideoView.setVisibility(View.GONE);
+    }
+
+    public Bitmap decodeSampledBitmapFromResource(Resources res,
+                                                         int resId, int reqWidth, int reqHeight) {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeResource(res, resId, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth,
+                reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeResource(res, resId, options);
+    }
+
+    public int calculateInSampleSize(BitmapFactory.Options options,
+                                            int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            // Calculate ratios of height and width to requested height and
+            // width
+            final int heightRatio = Math.round((float) height
+                    / (float) reqHeight);
+            final int widthRatio = Math.round((float) width / (float) reqWidth);
+
+            // Choose the smallest ratio as inSampleSize value, this will
+            // guarantee
+            // a final image with both dimensions larger than or equal to the
+            // requested height and width.
+            inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
+        }
+
+        return inSampleSize;
     }
 }

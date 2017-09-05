@@ -17,12 +17,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -44,11 +42,12 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.adapters.ChatMessageListAdapter;
-import com.pma.chat.pmaChat.adapters.StickerAdapter;
 import com.pma.chat.pmaChat.auth.AuthService;
 import com.pma.chat.pmaChat.auth.AuthServiceImpl;
 import com.pma.chat.pmaChat.auth.LoginActivity;
+import com.pma.chat.pmaChat.data.DatabaseHelper;
 import com.pma.chat.pmaChat.model.Chat;
+import com.pma.chat.pmaChat.model.ChatContact;
 import com.pma.chat.pmaChat.model.MapModel;
 import com.pma.chat.pmaChat.model.Message;
 import com.pma.chat.pmaChat.model.MessageType;
@@ -99,6 +98,8 @@ public class ChatActivity extends AppCompatActivity {
     private DatabaseReference mMessagesDatabaseReference;
     private ChildEventListener mChildEventListener;
 
+    private DatabaseHelper mLocalDatabaseInstance;
+
     private String mChatContactFirebaseUserId;
 
     // file can be photo, video or audio
@@ -116,7 +117,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private static final int RC_AUDIO_CAPTURE = 5;
 
-    private static final int STICKER_RECEIVED = 15;
+    private static final int RC_STICKER = 6;
 
     private File mLocalStorageDir;
 
@@ -128,7 +129,10 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         Intent intent = getIntent();
-        mChatContactFirebaseUserId = intent.getStringExtra("CHAT_CONTACT_FIREBASE_USER_ID");
+      //  mChatContactFirebaseUserId = intent.getStringExtra("CHAT_CONTACT_FIREBASE_USER_ID");
+        final ChatContact chatContact = (ChatContact) intent.getSerializableExtra("CHAT_CONTACT");
+
+        mLocalDatabaseInstance = DatabaseHelper.getInstance(getApplicationContext());
 
         mAuthService = new AuthServiceImpl();
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -136,6 +140,7 @@ public class ChatActivity extends AppCompatActivity {
         mLocalStorageDir = getExternalFilesDir(Environment.DIRECTORY_DCIM);
         mFirebaseStorage = FirebaseStorage.getInstance();
         mChatPhotosStorageReference = mFirebaseStorage.getReference().child(RemoteConfig.PHOTO_STORAGE);
+
         // Initialize references to views
         mProgressBar = (ProgressBar) findViewById(R.id.chatMessagesProgressBar);
         mMessageEditText = (EditText) findViewById(R.id.chatMessageField);
@@ -169,7 +174,6 @@ public class ChatActivity extends AppCompatActivity {
                     mChatDatabaseReference = dataIterator.next().getRef();
                     attachDatabaseReadListenerForMessages();
                 } else {
-                    //String key = dataSnapshot.getKey();
                     ValueEventListener findChatQuery2ValueEventListener = new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -181,6 +185,11 @@ public class ChatActivity extends AppCompatActivity {
                                 String chatKey = mChatsDatabaseReference.push().getKey();
                                 mChatDatabaseReference = mChatsDatabaseReference.child(chatKey);
                                 mChatDatabaseReference.child(RemoteConfig.CHAT_UNIQUE_MARK).setValue(userId + "_" + mChatContactFirebaseUserId);
+
+                                Chat chat = new Chat();
+                                chat.setChatContactId(chatContact.getId());
+                                mLocalDatabaseInstance.addOrUpdateChat(chat);
+
                                 attachDatabaseReadListenerForMessages();
                             }
                         }
@@ -209,7 +218,7 @@ public class ChatActivity extends AppCompatActivity {
         mStickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(new Intent(getApplicationContext(), StickerActivity.class), STICKER_RECEIVED);
+                startActivityForResult(new Intent(getApplicationContext(), StickerActivity.class), RC_STICKER);
             }
         });
 
@@ -301,18 +310,15 @@ public class ChatActivity extends AppCompatActivity {
             return;
         }
 
-        if (requestCode == STICKER_RECEIVED) {
-            Integer stickerDrawableId = data.getExtras().getInt("stickerId");
-            /* OVAJ ID JE U SUSTINI ID DRAWABLE-a STICKERA
-               NPR.  R.drawable.ic_cat
+        if (requestCode == RC_STICKER) {
+            String stickerName = data.getExtras().getString("stickerName");
 
-               ImageView imageView = new ImageView(context);
-               imageView.setImageResource(stickerDrawableId);
-            * */
+            Message message = new Message(MessageType.STICKER, stickerName, mAuthService.getUserId(), null, new Date());
 
-            // TODO: NAPRAVITI SLIKU SA OVIM ID-JEM, TO CE BITI STICKER KOJI SE TRAZI.
-            // UBACITI TU SLIKU U CHAT PORUKU.
-            Log.d("ChatActivity", "Sticker je izabran, njegov ID je: " + stickerDrawableId);
+            String id = mMessagesDatabaseReference.push().getKey();
+            mMessagesDatabaseReference.child(id).setValue(message);
+
+
         }
 
         if (requestCode == RC_AUDIO_CAPTURE ||

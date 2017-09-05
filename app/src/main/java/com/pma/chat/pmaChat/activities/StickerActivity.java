@@ -20,18 +20,18 @@ import com.pma.chat.pmaChat.adapters.StickerAdapter;
 
 public class StickerActivity extends AppCompatActivity {
 
-    private AdapterView.OnItemClickListener mListener;
+    private GridView mGridView;
 
     private StickerAdapter mAdapter;
 
-    private GridView mGridView;
+    private AdapterView.OnItemClickListener mListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.item_chat_stickers);
 
-        GridView gridView = (GridView) findViewById(R.id.gridView);
+        mGridView = (GridView) findViewById(R.id.gridView);
         mAdapter = new StickerAdapter(this);
 
         mListener = new AdapterView.OnItemClickListener() {
@@ -39,14 +39,14 @@ public class StickerActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.d("StickerActivity", "click event on sticker at position " + position);
                 Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
-                intent.putExtra("stickerId", (Integer) mAdapter.getItem(position));
+                intent.putExtra("stickerName", mAdapter.getItem(position));
                 StickerActivity.this.setResult(Activity.RESULT_OK, intent);
                 StickerActivity.this.finish();
             }
         };
 
-        gridView.setAdapter(mAdapter);
-        gridView.setOnItemClickListener(mListener);
+        mGridView.setAdapter(mAdapter);
+        mGridView.setOnItemClickListener(mListener);
     }
 
 }

@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.pma.chat.pmaChat.data.ChatContactContract;
+import com.pma.chat.pmaChat.model.ChatContact;
 import com.pma.chat.pmaChat.model.User;
 import com.pma.chat.pmaChat.R;
 
@@ -31,7 +32,7 @@ public class ChatContactsAdapter extends RecyclerView.Adapter<ChatContactsAdapte
      * The interface that receives onClick messages.
      */
     public interface ChatContactsAdapterOnClickHandler {
-        void onClick(String firebaseUserId);
+        void onClick(ChatContact chatContact);
     }
 
     private Cursor mCursor;
@@ -137,11 +138,11 @@ public class ChatContactsAdapter extends RecyclerView.Adapter<ChatContactsAdapte
             itemView.setOnClickListener(this);
         }
 
-        void bind(User user) {
-            // profilePhotoImageView.setImage
-            nameTextView.setText(user.getFirstName() + " " + user.getLastName());
-            statusTextView.setText("Offline");
-        }
+//        void bind(User user) {
+//            // profilePhotoImageView.setImage
+//            nameTextView.setText(user.getFirstName() + " " + user.getLastName());
+//            statusTextView.setText("Offline");
+//        }
 
         /**
          * This gets called by the child views during a click. We fetch the date that has been
@@ -154,8 +155,14 @@ public class ChatContactsAdapter extends RecyclerView.Adapter<ChatContactsAdapte
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
             mCursor.moveToPosition(adapterPosition);
-            String firebaseUserId = mCursor.getString(mCursor.getColumnIndex(ChatContactContract.ChatContactEntry.COLUMN_FIREBASE_USER_ID));
-            mClickHandler.onClick(firebaseUserId);
+           // String firebaseUserId = mCursor.getString(mCursor.getColumnIndex(ChatContactContract.ChatContactEntry.COLUMN_FIREBASE_USER_ID));
+            ChatContact chatContact = new ChatContact(
+                    mCursor.getLong(mCursor.getColumnIndex(ChatContactContract.ChatContactEntry._ID)),
+                    mCursor.getString(mCursor.getColumnIndex(ChatContactContract.ChatContactEntry.COLUMN_NAME)),
+                    mCursor.getString(mCursor.getColumnIndex(ChatContactContract.ChatContactEntry.COLUMN_NUMBER)),
+                    mCursor.getString(mCursor.getColumnIndex(ChatContactContract.ChatContactEntry.COLUMN_FIREBASE_USER_ID))
+            );
+            mClickHandler.onClick(chatContact);
         }
     }
 }

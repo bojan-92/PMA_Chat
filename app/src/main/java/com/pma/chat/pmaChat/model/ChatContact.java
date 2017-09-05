@@ -1,7 +1,9 @@
 package com.pma.chat.pmaChat.model;
 
 
-public class ChatContact {
+import java.io.Serializable;
+
+public class ChatContact implements Serializable {
 
     private Long id;
 

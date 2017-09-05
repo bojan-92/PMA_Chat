@@ -8,7 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.pma.chat.pmaChat.data.ChatContactContract.ChatContactEntry;
+import com.pma.chat.pmaChat.data.ChatContract.ChatEntry;
 import com.pma.chat.pmaChat.data.MessageContract.MessageEntry;
+import com.pma.chat.pmaChat.model.Chat;
 import com.pma.chat.pmaChat.model.ChatContact;
 
 import java.util.ArrayList;
@@ -48,6 +50,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         ChatContactEntry.COLUMN_NUMBER  + " TEXT NOT NULL, " +
                         ChatContactEntry.COLUMN_FIREBASE_USER_ID  + " TEXT NOT NULL )";
 
+        final String SQL_CREATE_CHAT_TABLE =
+                "CREATE TABLE " + ChatEntry.TABLE_NAME + " (" +
+                        ChatEntry._ID                               + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                      //  ChatEntry.COLUMN_CHAT_CONTACT_FIREBASE_ID   + " TEXT NOT NULL, " +
+                        ChatEntry.COLUMN_CHAT_CONTACT_ID   + " INTEGER NOT NULL, " +
+                        "FOREIGN KEY " + (ChatEntry.COLUMN_CHAT_CONTACT_ID) + " REFERENCES " + ChatContactEntry.TABLE_NAME + "(" + ChatContactEntry._ID + ") " + " )";
+
         final String SQL_CREATE_MESSAGE_TABLE =
                 "CREATE TABLE " + MessageEntry.TABLE_NAME + " (" +
                         MessageEntry._ID                    + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -60,6 +69,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         MessageEntry.COLUMN_TIMESTAMP       + " TEXT NOT NULL)";
 
         sqLiteDatabase.execSQL(SQL_CREATE_CHAT_CONTACT_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_CHAT_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_MESSAGE_TABLE);
     }
 
@@ -160,6 +170,80 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(SELECT_QUERY, null);
 
         return cursor;
+    }
+
+    public ChatContact getChatContactById(Long chatContactId) {
+
+        String SELECT_QUERY =
+                String.format("SELECT * FROM %s WHERE %s = ?",
+                        ChatContactEntry.TABLE_NAME, ChatContactEntry._ID);
+
+        // "getReadableDatabase()" and "getWriteableDatabase()" return the same object (except under low disk space scenarios)
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery(SELECT_QUERY, new String[]{String.valueOf(chatContactId)});
+
+        try {
+            if (cursor.moveToFirst()) {
+                ChatContact contact = new ChatContact();
+                contact.setName(cursor.getString(cursor.getColumnIndex(ChatContactEntry.COLUMN_NAME)));
+                contact.setPhoneNumber(cursor.getString(cursor.getColumnIndex(ChatContactEntry.COLUMN_NUMBER)));
+                contact.setFirebaseUserId(cursor.getString(cursor.getColumnIndex(ChatContactEntry.COLUMN_FIREBASE_USER_ID)));
+                return contact;
+            }
+        } catch (Exception e) {
+            //Log.d(TAG, "Error while trying to get posts from database");
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+
+        return null;
+    }
+
+    public long addOrUpdateChat(Chat chat) {
+        // The database connection is cached so it's not expensive to call getWriteableDatabase() multiple times.
+        SQLiteDatabase db = getWritableDatabase();
+        long chatId = -1;
+
+        db.beginTransaction();
+        try {
+            ContentValues values = new ContentValues();
+            values.put(ChatEntry.COLUMN_CHAT_CONTACT_ID, chat.getChatContactId());
+//
+//            // First try to update the user in case the user already exists in the database
+//            // This assumes phoneNumber are unique
+//            int rows = db.update(ChatEntry.TABLE_NAME, values, ChatEntry.COLUMN_NUMBER + "= ?", new String[]{ChatEntry.getPhoneNumber()});
+//
+//            // Check if update succeeded
+//            if (rows == 1) {
+//                // Get the primary key of the user we just updated
+//                String contactsSelectQuery = String.format("SELECT %s FROM %s WHERE %s = ?",
+//                        ChatContactEntry._ID, ChatContactEntry.TABLE_NAME, ChatContactEntry.COLUMN_NUMBER);
+//                Cursor cursor = db.rawQuery(contactsSelectQuery, new String[]{String.valueOf(chatContact.getPhoneNumber())});
+//                try {
+//                    if (cursor.moveToFirst()) {
+//                        userId = cursor.getInt(0);
+//                        db.setTransactionSuccessful();
+//                    }
+//                } finally {
+//                    if (cursor != null && !cursor.isClosed()) {
+//                        cursor.close();
+//                    }
+//                }
+//            } else {
+//                // user with this userName did not already exist, so insert new user
+//                userId = db.insertOrThrow(ChatContactEntry.TABLE_NAME, null, values);
+//                db.setTransactionSuccessful();
+//            }
+            chatId = db.insertOrThrow(ChatEntry.TABLE_NAME, null, values);
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            // Log.d(TAG, "Error while trying to add or update user");
+        } finally {
+            db.endTransaction();
+        }
+        return chatId;
     }
 
 }

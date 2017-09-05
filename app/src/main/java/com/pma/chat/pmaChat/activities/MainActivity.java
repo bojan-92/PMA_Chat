@@ -75,8 +75,6 @@ public class MainActivity extends AppCompatActivity  {
         mListView.setAdapter(mListAdapter);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
 
-
-
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

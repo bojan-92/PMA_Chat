@@ -184,10 +184,11 @@ public class ChatContactListFragment extends Fragment implements
 
 
     @Override
-    public void onClick(String firebaseUserId) {
+    public void onClick(ChatContact chatContact) {
 
         Intent chatIntent = new Intent(getContext(), ChatActivity.class);
-        chatIntent.putExtra("CHAT_CONTACT_FIREBASE_USER_ID", firebaseUserId);
+      //  chatIntent.putExtra("CHAT_CONTACT_FIREBASE_USER_ID", firebaseUserId);
+        chatIntent.putExtra("CHAT_CONTACT", chatContact);
         startActivity(chatIntent);
     }
 

@@ -1,35 +1,46 @@
 package com.pma.chat.pmaChat.model;
 
 
-import java.util.List;
+import java.io.Serializable;
 
-public class Chat {
+public class Chat implements Serializable {
 
-    private String userIdsPair;
+    private Long id;
 
-    private List<Message> messages;
+    private Long chatContactId;
+
+    private String firebaseChatId;
 
     public Chat() {
     }
 
-    public Chat(String userIdsPair, List<Message> messages) {
-        this.userIdsPair = userIdsPair;
-        this.messages = messages;
+    public Chat(Long id, Long chatContactId, String firebaseChatId) {
+        this.id = id;
+        this.chatContactId = chatContactId;
+        this.firebaseChatId = firebaseChatId;
     }
 
-    public String getUserIdsPair() {
-        return userIdsPair;
+    public Long getId() {
+        return id;
     }
 
-    public void setUserIdsPair(String userIdsPair) {
-        this.userIdsPair = userIdsPair;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public List<Message> getMessages() {
-        return messages;
+    public Long getChatContactId() {
+        return chatContactId;
     }
 
-    public void setMessages(List<Message> messages) {
-        this.messages = messages;
+    public void setChatContactId(Long chatContactId) {
+        this.chatContactId = chatContactId;
+    }
+
+    public String getFirebaseChatId() {
+        return firebaseChatId;
+    }
+
+    public void setFirebaseChatId(String firebaseChatId) {
+        this.firebaseChatId = firebaseChatId;
     }
 }
