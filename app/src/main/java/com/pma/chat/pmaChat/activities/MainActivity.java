@@ -20,6 +20,7 @@ import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.adapters.DrawerListAdapter;
 import com.pma.chat.pmaChat.adapters.StickerAdapter;
 import com.pma.chat.pmaChat.auth.LoginActivity;
+import com.pma.chat.pmaChat.fragments.ChatListFragment;
 import com.pma.chat.pmaChat.model.NavItem;
 import com.pma.chat.pmaChat.data.DatabaseHelper;
 import com.pma.chat.pmaChat.fragments.ChatContactListFragment;
@@ -84,12 +85,15 @@ public class MainActivity extends AppCompatActivity  {
                         fragment = new ChatContactListFragment();
                         break;
                     case 2:
-                        fragment = new ProfileSettingsFragment();
+                        fragment = new ChatListFragment();
                         break;
                     case 3:
-                        fragment = new ChatContactProfileFragment();
+                        fragment = new ProfileSettingsFragment();
                         break;
                     case 4:
+                        fragment = new ChatContactProfileFragment();
+                        break;
+                    case 5:
                         mFirebaseAuth.signOut();
                         Intent i = new Intent(MainActivity.this.getApplicationContext(), LoginActivity.class);
                         startActivity(i);
@@ -129,7 +133,8 @@ public class MainActivity extends AppCompatActivity  {
      * @param mNavItems The list of items in the navigation drawer.
      */
     private void initDrawerListItems(List<NavItem> mNavItems ){
-        mNavItems.add(new NavItem(getString(R.string.friendsList), R.drawable.ic_startchat));
+        mNavItems.add(new NavItem(getString(R.string.friendsList), R.drawable.ic_two_users));
+        mNavItems.add(new NavItem(getString(R.string.chatList), R.drawable.ic_startchat));
         mNavItems.add(new NavItem(getString(R.string.edit_profile_settings), R.drawable.ic_settings));
         mNavItems.add(new NavItem(getString(R.string.myProfile), R.drawable.ic_avatar));
         mNavItems.add(new NavItem(getString(R.string.logout), R.drawable.ic_cancel));
