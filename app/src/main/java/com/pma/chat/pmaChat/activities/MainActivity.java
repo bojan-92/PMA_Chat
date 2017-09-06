@@ -15,7 +15,15 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.adapters.DrawerListAdapter;
 import com.pma.chat.pmaChat.adapters.StickerAdapter;
@@ -26,6 +34,8 @@ import com.pma.chat.pmaChat.data.DatabaseHelper;
 import com.pma.chat.pmaChat.fragments.ChatContactListFragment;
 import com.pma.chat.pmaChat.fragments.ChatContactProfileFragment;
 import com.pma.chat.pmaChat.fragments.ProfileSettingsFragment;
+import com.pma.chat.pmaChat.model.User;
+import com.pma.chat.pmaChat.utils.RemoteConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +58,9 @@ public class MainActivity extends AppCompatActivity  {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
+    private DatabaseReference mRootDatabaseReference = FirebaseDatabase.getInstance().getReference();
+    private DatabaseReference mUserReference;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +75,8 @@ public class MainActivity extends AppCompatActivity  {
         initDrawerListItems(mNavItems);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
+        String userId = mFirebaseAuth.getCurrentUser().getUid();
+        mUserReference = mRootDatabaseReference.child(RemoteConfig.USER).child(userId);
 
         if(mFirebaseAuth.getCurrentUser() == null){
             finish();
@@ -105,6 +120,25 @@ public class MainActivity extends AppCompatActivity  {
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 fragmentManager.beginTransaction().replace(R.id.relativeLayout, fragment).commit();
                 mDrawerLayout.closeDrawers();
+            }
+        });
+
+        mUserReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                User userInfo = dataSnapshot.getValue(User.class);
+
+                if(userInfo.getProfileImageUri() != null) {
+                    Glide.with(mDrawerHeaderAvatar.getContext())
+                            .load(userInfo.getProfileImageUri())
+                            .into(mDrawerHeaderAvatar);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
 

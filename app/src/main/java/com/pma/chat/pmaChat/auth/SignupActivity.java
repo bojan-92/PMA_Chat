@@ -120,7 +120,7 @@ public class SignupActivity extends Activity {
                 progressDialog.setMessage("Registering User ...");
                 progressDialog.show();
 
-                userInfo = new User(firstName, lastName, phoneNumber, calendar);
+                userInfo = new User(firstName, lastName, phoneNumber);
 
                 mAuthService.registerUser(email, password, userInfo, new    AuthCallback() {
                     @Override

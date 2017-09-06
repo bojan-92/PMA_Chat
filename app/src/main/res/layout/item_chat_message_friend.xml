@@ -94,7 +94,6 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_margin="16dp"
-        android:layout_alignParentLeft="true"
-        android:src="@drawable/user_pacific" />
+        android:layout_alignParentLeft="true" />
 
 </RelativeLayout>

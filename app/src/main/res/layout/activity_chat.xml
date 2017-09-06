@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/colorLight">
 
     <ListView
         android:id="@+id/chatMessagesList"
@@ -59,8 +60,7 @@
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:background="@drawable/ic_camera_alt_black_24px"
-            android:textColor="#FFF"
-            />
+            android:textColor="#FFF" />
 
         <Button
             android:id="@+id/btnCameraVideo"
@@ -88,6 +88,7 @@
             android:textColor="#FFF"
 
             />
+
         <Button
             android:id="@+id/btnStick"
             android:layout_width="36dp"
@@ -96,8 +97,6 @@
             android:textColor="#FFF"
 
             />
-
-
 
     </LinearLayout>
 

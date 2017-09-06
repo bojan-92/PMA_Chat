@@ -21,6 +21,7 @@
     <string name="signUpHeader">Sign Up on PMA Chat</string>
     <string name="firstName">First name</string>
     <string name="lastName">Last name</string>
+    <string name="phoneNumber">Phone Number</string>
     <string name="confirmPassword">Password confirm</string>
     <string name="signUpGoBackToLogin">Back to Login</string>
     <string name="birthdayLabel">Birthday</string>
@@ -51,7 +52,11 @@
     <string name="passwordAndConfirmationDoNotMatchMessage">Password and Password Confirm do not match!</string>
     <string name="registeringUserMessage">Registering User ...</string>
     <string name="failedSavingUserInfoMessage">Saving user info failed!</string>
-
-
+    <string name="profileSettingsSuccessfullyChanged">Profile settings successfully changed!</string>
+    <string name="profileImageSuccessfullyChanged">Profile image successfully changed!</string>
+    <string name="firstNameLabel">First name: </string>
+    <string name="lastNameLabel">Last name: </string>
+    <string name="phoneNumberLabel">Phone Number: </string>
+    <string name="chatContactProfileTitle">Contact Profile</string>
 
 </resources>

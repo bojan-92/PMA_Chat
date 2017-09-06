@@ -1,47 +1,57 @@
 package com.pma.chat.pmaChat.fragments;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.auth.LoginActivity;
-import com.pma.chat.pmaChat.auth.SignupActivity;
 import com.pma.chat.pmaChat.model.User;
 import com.pma.chat.pmaChat.utils.RemoteConfig;
 
 
 public class ProfileSettingsFragment extends Fragment {
 
-    private TextView tvLogout;
-    private EditText txtFirstName;
-    private EditText txtLastName;
-    private Button btnSave;
+    private static int GALLERY_CODE = 1;
+
+    private TextView mLogoutTextView;
+    private EditText mFirstNameEditText;
+    private EditText mLastNameEditText;
+    private ImageView mProfilePhotoImageView;
+    private Button mSaveButton;
+
+    private ProgressDialog mProgressDialog;
 
     private FirebaseAuth mFirebaseAuth;
+    private StorageReference mUsersProfileImagesStorageReference;
 
     private DatabaseReference mRootDatabaseReference = FirebaseDatabase.getInstance().getReference();
+    private DatabaseReference mUserReference;
 
-    private User mUser;
-
-    private ChildEventListener mChildEventListener;
+    private User mUserInfo;
 
     @Nullable
     @Override
@@ -50,30 +60,33 @@ public class ProfileSettingsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile_settings, container, false);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
+        mUsersProfileImagesStorageReference = FirebaseStorage.getInstance().getReference().child(RemoteConfig.USERS_PROFILE_PHOTOS_STORAGE);
+
         String userId = mFirebaseAuth.getCurrentUser().getUid();
-        final DatabaseReference currentUserRef = mRootDatabaseReference.child(RemoteConfig.USER).child(userId);
+        mUserReference = mRootDatabaseReference.child(RemoteConfig.USER).child(userId);
 
-        tvLogout = (TextView) view.findViewById(R.id.tvLogout);
-        btnSave = (Button) view.findViewById(R.id.btnSaveProfileSettings);
+        mLogoutTextView = (TextView) view.findViewById(R.id.tvLogout);
+        mSaveButton = (Button) view.findViewById(R.id.btnSaveProfileSettings);
 
-        txtFirstName = (EditText) view.findViewById(R.id.txtProfileSettingsFirstName);
-        txtLastName = (EditText) view.findViewById(R.id.txtProfileSettingsLastName);
-//        String firstName = txtFirstName.getText().toString().trim();
-//        String lastName = txtLastName.getText().toString().trim();
+        mFirstNameEditText = (EditText) view.findViewById(R.id.txtProfileSettingsFirstName);
+        mLastNameEditText = (EditText) view.findViewById(R.id.txtProfileSettingsLastName);
+        mProfilePhotoImageView = (ImageView) view.findViewById(R.id.imageViewProfile);
 
-        currentUserRef.addValueEventListener(new ValueEventListener() {
+        mProgressDialog = new ProgressDialog(this.getContext());
+
+        mUserReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                mUser = dataSnapshot.getValue(User.class);
+                mUserInfo = dataSnapshot.getValue(User.class);
 
-                txtFirstName.setText(mUser.getFirstName());
-                txtLastName.setText(mUser.getLastName());
-
-
-
-//                String firstName = .getText().toString().trim();
-//                 String lastName = txtLastName.getText().toString().trim();
+                mFirstNameEditText.setText(mUserInfo.getFirstName());
+                mLastNameEditText.setText(mUserInfo.getLastName());
+                if(mUserInfo.getProfileImageUri() != null) {
+                    Glide.with(mProfilePhotoImageView.getContext())
+                            .load(mUserInfo.getProfileImageUri())
+                            .into(mProfilePhotoImageView);
+                }
             }
 
             @Override
@@ -82,7 +95,7 @@ public class ProfileSettingsFragment extends Fragment {
             }
         });
 
-        tvLogout.setOnClickListener(new View.OnClickListener() {
+        mLogoutTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mFirebaseAuth.signOut();
@@ -91,46 +104,95 @@ public class ProfileSettingsFragment extends Fragment {
             }
         });
 
-        btnSave.setOnClickListener(new View.OnClickListener() {
+        mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                String firstName = txtFirstName.getText().toString().trim();
-                String lastName = txtLastName.getText().toString().trim();
+                String firstName = mFirstNameEditText.getText().toString().trim();
+                String lastName = mLastNameEditText.getText().toString().trim();
 
-                if(!isFormValid(firstName, lastName) || mUser == null) {
+                if(!isFormValid(firstName, lastName) || mUserInfo == null) {
                     return;
                 }
 
-                mUser.setFirstName(firstName);
-                mUser.setLastName(lastName);
+                mUserInfo.setFirstName(firstName);
+                mUserInfo.setLastName(lastName);
 
-                currentUserRef.setValue(mUser, new DatabaseReference.CompletionListener() {
+                mProgressDialog.setMessage("Saving changes ...");
+                mProgressDialog.show();
+
+                mUserReference.setValue(mUserInfo, new DatabaseReference.CompletionListener() {
                     @Override
                     public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                        // TODO : add some notification (toast or something)
-                        Log.i("TODO-MESSAGE", "TODO-MESSSAGE");
+                        mProgressDialog.dismiss();
+                        Toast.makeText(ProfileSettingsFragment.this.getContext(), R.string.profileSettingsSuccessfullyChanged, Toast.LENGTH_SHORT).show();
                     }
                 });
+            }
+        });
 
-
+        mProfilePhotoImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/jpeg");
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                startActivityForResult(Intent.createChooser(intent, "Complete action using"), GALLERY_CODE);
             }
         });
 
         return view;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == GALLERY_CODE && data != null) {
+            Uri fileUri = data.getData();
+
+            // Get a reference to store file at photos/<FILENAME>
+            StorageReference storageRef = mUsersProfileImagesStorageReference
+                    .child(fileUri.getLastPathSegment());
+
+            mProgressDialog.setMessage("Saving changes ...");
+            mProgressDialog.show();
+
+            // Upload file to Firebase Storage
+            storageRef.putFile(fileUri)
+                    .addOnSuccessListener(this.getActivity(), new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // When the image has successfully uploaded, we get its download URL
+                            @SuppressWarnings("VisibleForTests")
+                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
+
+                            mUserInfo.setProfileImageUri(downloadUrl.toString());
+
+                            mUserReference.setValue(mUserInfo, new DatabaseReference.CompletionListener() {
+                                @Override
+                                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                    // TODO : add some notification (toast or something)
+                                    Toast.makeText(ProfileSettingsFragment.this.getContext(), R.string.profileImageSuccessfullyChanged, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                            mProgressDialog.dismiss();
+
+                        }
+                    });
+        }
+    }
+
 
     private boolean isFormValid(String firstName, String lastName) {
         if (TextUtils.isEmpty(firstName)) {
-
+            Toast.makeText(ProfileSettingsFragment.this.getContext(), R.string.firstNameFieldEmptyMessage, Toast.LENGTH_SHORT).show();
             return false;
         }
         if (TextUtils.isEmpty(lastName)) {
-
+            Toast.makeText(ProfileSettingsFragment.this.getContext(), R.string.lastNameFieldEmptyMessage, Toast.LENGTH_SHORT).show();
             return false;
         }
-
         return true;
     }
 }

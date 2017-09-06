@@ -89,7 +89,6 @@ public class ChatActivity extends AppCompatActivity {
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseStorage mFirebaseStorage;
-    private StorageReference mChatPhotosStorageReference;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     private DatabaseReference mRootDatabaseReference = FirebaseDatabase.getInstance().getReference();
@@ -139,7 +138,6 @@ public class ChatActivity extends AppCompatActivity {
 
         mLocalStorageDir = getExternalFilesDir(Environment.DIRECTORY_DCIM);
         mFirebaseStorage = FirebaseStorage.getInstance();
-        mChatPhotosStorageReference = mFirebaseStorage.getReference().child(RemoteConfig.PHOTO_STORAGE);
 
         // Initialize references to views
         mProgressBar = (ProgressBar) findViewById(R.id.chatMessagesProgressBar);

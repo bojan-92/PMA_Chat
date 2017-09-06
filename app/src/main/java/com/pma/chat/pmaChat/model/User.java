@@ -11,16 +11,15 @@ public class User {
 
     private String phoneNumber;
 
-  //  private Calendar birthday;
+    private String profileImageUri;
 
     public User() {
     }
 
-    public User(String firstName, String lastName, String phoneNumber, Calendar birthday) {
+    public User(String firstName, String lastName, String phoneNumber) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
-    //    this.birthday = birthday;
     }
 
     public String getFirstName() {
@@ -47,12 +46,11 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    /*
-    public Calendar getBirthday() {
-        return birthday;
+    public String getProfileImageUri() {
+        return profileImageUri;
     }
 
-    public void setBirthday(Calendar birthday) {
-        this.birthday = birthday;
-    }*/
+    public void setProfileImageUri(String profileImageUri) {
+        this.profileImageUri = profileImageUri;
+    }
 }

@@ -10,7 +10,7 @@
         android:background="@color/colorAccent"
         android:contextClickable="true"
         android:gravity="center_vertical"
-        android:text="@string/userTitle"
+        android:text="@string/chatContactProfileTitle"
         android:textAlignment="center"
         android:textColor="#FFF" />
 
@@ -21,8 +21,7 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/usersTop"
         android:background="@color/colorPrimaryDark"
-        android:src="@drawable/ic_android_logo"
-        />
+        android:src="@drawable/ic_android_logo" />
 
     <TextView
         android:id="@+id/txtFirstName"
@@ -50,25 +49,25 @@
         android:textAlignment="center"
         android:inputType="text" />
 
-    <TextView
-        android:id="@+id/txtSignUpEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/txtLastName"
-        android:layout_marginTop="14dp"
-        android:ems="10"
-        android:hint="@string/loginEmail"
-        android:padding="5dp"
-        android:textAlignment="center"
-        android:inputType="textEmailAddress" />
+    <!--<TextView-->
+        <!--android:id="@+id/txtSignUpEmail"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_below="@+id/txtLastName"-->
+        <!--android:layout_marginTop="14dp"-->
+        <!--android:ems="10"-->
+        <!--android:hint="@string/loginEmail"-->
+        <!--android:padding="5dp"-->
+        <!--android:textAlignment="center"-->
+        <!--android:inputType="textEmailAddress" />-->
 
     <TextView
         android:id="@+id/txtPhoneNumber"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/txtSignUpEmail"
+        android:layout_below="@+id/txtLastName"
         android:layout_marginTop="12dp"
         android:ems="10"
         android:padding="5dp"

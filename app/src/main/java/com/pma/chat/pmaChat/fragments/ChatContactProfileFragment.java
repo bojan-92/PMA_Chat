@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -22,6 +23,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.pma.chat.pmaChat.R;
+import com.pma.chat.pmaChat.activities.ChatActivity;
+import com.pma.chat.pmaChat.data.DatabaseHelper;
+import com.pma.chat.pmaChat.model.ChatContact;
 import com.pma.chat.pmaChat.model.User;
 import com.pma.chat.pmaChat.utils.RemoteConfig;
 
@@ -34,16 +38,16 @@ public class ChatContactProfileFragment extends Fragment {
     Button cpBtn;
     ImageView ivProfile;
 
-
     private TextView mFirstName;
     private TextView mLastName;
     private TextView mEmail;
     private TextView mPhoneNumber;
+    private ImageView mProfilePhotoImageView;
+
     private FirebaseAuth mFirebaseAuth;
-
-
     private DatabaseReference mRootDatabaseReference = FirebaseDatabase.getInstance().getReference();
-    private ChildEventListener mChildEventListener;
+
+    private DatabaseHelper mLocalDatabaseInstance;
 
     @Nullable
     @Override
@@ -56,10 +60,18 @@ public class ChatContactProfileFragment extends Fragment {
         String userId = mFirebaseAuth.getCurrentUser().getUid();
         DatabaseReference currentUserRef = mRootDatabaseReference.child(RemoteConfig.USER).child(userId);
 
+        mLocalDatabaseInstance = DatabaseHelper.getInstance(this.getContext().getApplicationContext());
+
         mFirstName = (TextView) view.findViewById(R.id.txtFirstName);
         mLastName = (TextView) view.findViewById(R.id.txtLastName);
-        mEmail = (TextView) view.findViewById(R.id.txtSignUpEmail);
+       // mEmail = (TextView) view.findViewById(R.id.txtSignUpEmail);
         mPhoneNumber = (TextView) view.findViewById(R.id.txtPhoneNumber);
+
+        mProfilePhotoImageView = (ImageView) view.findViewById(R.id.imageViewProfile);
+
+        mFirstName.setText(R.string.firstNameLabel);
+        mLastName.setText(R.string.lastNameLabel);
+        mPhoneNumber.setText(R.string.phoneNumberLabel);
 
         cpBtn  = (Button) view.findViewById(R.id.changePictureButton);
         ivProfile  = (ImageView) view.findViewById(R.id.imageViewProfile);
@@ -68,12 +80,18 @@ public class ChatContactProfileFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                User user = dataSnapshot.getValue(User.class);
+                User userInfo = dataSnapshot.getValue(User.class);
 
-                mFirstName.setText("First name: " + user.getFirstName());
-                mLastName.setText("Last name: " +user.getLastName());
-                mEmail.setText("Email: " + mFirebaseAuth.getCurrentUser().getEmail());
-                mPhoneNumber.setText("Number: " +user.getPhoneNumber());
+                mFirstName.append(userInfo.getFirstName());
+                mLastName.append(userInfo.getLastName());
+                mPhoneNumber.append(userInfo.getPhoneNumber());
+                //mEmail.setText("Email: " + mFirebaseAuth.getCurrentUser().getEmail());
+
+                if(userInfo.getProfileImageUri() != null) {
+                    Glide.with(mProfilePhotoImageView.getContext())
+                            .load(userInfo.getProfileImageUri())
+                            .into(mProfilePhotoImageView);
+                }
             }
 
             @Override
@@ -85,26 +103,15 @@ public class ChatContactProfileFragment extends Fragment {
         cpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/jpeg");
-                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-                startActivityForResult(Intent.createChooser(intent, "Complete action using"), GALLERY_CODE);
+//                Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+//                ChatContact chatContact = mLocalDatabaseInstance.getChatContactById();
+//                chatIntent.putExtra("CHAT_CONTACT", chatContact);
+//                startActivity(chatIntent);
             }
         });
 
 
         return view;
     }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == GALLERY_CODE && null != data) {
-            Uri selectedImage = data.getData();
-            ivProfile.setImageURI(selectedImage);
-        }
-    }
-
 
 }

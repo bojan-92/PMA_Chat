@@ -29,7 +29,7 @@
         android:layout_marginRight="16dp"
         android:layout_marginTop="32dp"
         android:visibility="gone"
-        android:layout_toLeftOf="@+id/chat_profile_image"
+        android:layout_toLeftOf="@+id/chat_profile_image_holder"
         android:src="@drawable/message_arrow" />
 
     <VideoView
@@ -51,7 +51,7 @@
         android:layout_marginRight="16dp"
         android:layout_marginTop="32dp"
         android:visibility="gone"
-        android:layout_toLeftOf="@+id/chat_profile_image"
+        android:layout_toLeftOf="@+id/chat_profile_image_holder"
         android:src="@drawable/message_arrow" />
 
     <TextView
@@ -77,7 +77,7 @@
         android:layout_marginRight="16dp"
         android:layout_marginTop="32dp"
         android:visibility="gone"
-        android:layout_toLeftOf="@+id/chat_profile_image"
+        android:layout_toLeftOf="@+id/chat_profile_image_holder"
         android:src="@drawable/message_arrow" />
 <!--
     <TextView
@@ -89,13 +89,25 @@
         tools:text="Name" />
 -->
 
-
-    <ImageView
-        android:id="@+id/chat_profile_image"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+    <FrameLayout
+        android:id="@+id/chat_profile_image_holder"
+        android:layout_width="54dp"
+        android:layout_height="54dp"
         android:layout_margin="16dp"
-        android:layout_alignParentRight="true"
-        android:src="@drawable/user_pacific" />
+        android:layout_alignParentRight="true">
+
+        <ImageView
+            android:id="@+id/chat_profile_image"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="8dp"
+            android:layout_alignParentRight="true" />
+
+        <ImageView
+            android:src="@drawable/profile_image_wrapper_small"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
 
 </RelativeLayout>

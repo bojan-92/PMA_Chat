@@ -18,8 +18,15 @@ import android.widget.VideoView;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.model.Message;
+import com.pma.chat.pmaChat.model.User;
+import com.pma.chat.pmaChat.utils.RemoteConfig;
 
 import java.util.List;
 
@@ -33,6 +40,11 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
 
     private TextView mMessageContentTextView;
     private ImageView mMessageArrowTextView;
+
+    private ImageView mProfilePhotoImageView;
+
+    private DatabaseReference mRootDatabaseReference = FirebaseDatabase.getInstance().getReference();
+    private DatabaseReference mUserReference;
 
     private static final int TYPES_COUNT = 2;
     private static final int TYPE_ME = 0;
@@ -79,9 +91,12 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
 
         mMessageContentTextView = (TextView) convertView.findViewById(R.id.chat_message_text_content);
         mMessageArrowTextView = (ImageView) convertView.findViewById(R.id.chat_message_arrow_text_content);
-      //  TextView tvMessageAuthor = (TextView) convertView.findViewById(R.id.chatMessageAuthor);
+
+        mProfilePhotoImageView = (ImageView) convertView.findViewById(R.id.chat_profile_image);
 
         Message message = getItem(position);
+
+        mUserReference = mRootDatabaseReference.child(RemoteConfig.USER).child(message.getSenderId());
 
         if(message.getType() == null) {
             mMessageContentTextView.setVisibility(View.VISIBLE);
@@ -89,6 +104,8 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
             mMessageContentTextView.setText(message.getContent());
             return convertView;
         }
+
+        ViewGroup.LayoutParams messageContentImageViewLayoutParams = (ViewGroup.LayoutParams) mMessageContentImageView.getLayoutParams();
 
         switch(message.getType()) {
 
@@ -106,6 +123,10 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
                 Glide.with(mMessageContentImageView.getContext())
                         .load(message.getContent())
                         .into(mMessageContentImageView);
+                messageContentImageViewLayoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                messageContentImageViewLayoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                mMessageContentImageView.setLayoutParams(messageContentImageViewLayoutParams);
+
                 break;
 
             case VIDEO:
@@ -143,15 +164,33 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
                 options.inJustDecodeBounds = true;
 
                 mMessageContentImageView.setImageResource(resourceId);
-                ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) mMessageContentImageView.getLayoutParams();
-                params.width = 200;
-                params.height = 200;
-                mMessageContentImageView.setLayoutParams(params);
+                messageContentImageViewLayoutParams.width = 200;
+                messageContentImageViewLayoutParams.height = 200;
+                mMessageContentImageView.setLayoutParams(messageContentImageViewLayoutParams);
 
                 break;
 
         }
-        //   tvMessageAuthor.setText(message.getSenderId().ge);
+
+        mUserReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                User userInfo = dataSnapshot.getValue(User.class);
+
+                if(userInfo.getProfileImageUri() != null) {
+                    Glide.with(mProfilePhotoImageView.getContext())
+                            .load(userInfo.getProfileImageUri())
+                            .into(mProfilePhotoImageView);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
 
         return convertView;
     }
@@ -159,48 +198,8 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
     private void hideAllContentViews() {
         mMessageContentTextView.setVisibility(View.GONE);
         mMessageContentImageView.setVisibility(View.GONE);
+        mMessageArrowPhotoView.setVisibility(View.GONE);
         mMessageContentVideoView.setVisibility(View.GONE);
     }
 
-    public Bitmap decodeSampledBitmapFromResource(Resources res,
-                                                         int resId, int reqWidth, int reqHeight) {
-
-        // First decode with inJustDecodeBounds=true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeResource(res, resId, options);
-
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth,
-                reqHeight);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeResource(res, resId, options);
-    }
-
-    public int calculateInSampleSize(BitmapFactory.Options options,
-                                            int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-
-            // Calculate ratios of height and width to requested height and
-            // width
-            final int heightRatio = Math.round((float) height
-                    / (float) reqHeight);
-            final int widthRatio = Math.round((float) width / (float) reqWidth);
-
-            // Choose the smallest ratio as inSampleSize value, this will
-            // guarantee
-            // a final image with both dimensions larger than or equal to the
-            // requested height and width.
-            inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
-        }
-
-        return inSampleSize;
-    }
 }

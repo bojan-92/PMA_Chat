@@ -13,11 +13,24 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ImageView
-        android:id="@+id/drawer_header_avatar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_android" />
+    <FrameLayout
+        android:id="@+id/chat_profile_image_holder"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_alignParentRight="true">
+
+        <ImageView
+            android:id="@+id/drawer_header_avatar"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_margin="8dp"/>
+
+        <ImageView
+            android:src="@drawable/profile_image_wrapper_big"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/drawer_header_username"
