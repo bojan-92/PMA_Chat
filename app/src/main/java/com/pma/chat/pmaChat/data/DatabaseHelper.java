@@ -240,4 +240,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return chatId;
     }
 
+    public Cursor getAllChatsCursor() {
+
+        String SELECT_QUERY =
+                String.format("SELECT * FROM %s", ChatEntry.TABLE_NAME);
+
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery(SELECT_QUERY, null);
+
+        return cursor;
+    }
+
 }

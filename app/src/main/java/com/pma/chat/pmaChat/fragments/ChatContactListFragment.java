@@ -63,7 +63,7 @@ public class ChatContactListFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, Bundle savedInstanceState) {
 
-        final ChatContactListFragment fragment = this;
+        //final ChatContactListFragment fragment = this;
 
         final View view = inflater.inflate(R.layout.fragment_chat_contacts, container, false);
 

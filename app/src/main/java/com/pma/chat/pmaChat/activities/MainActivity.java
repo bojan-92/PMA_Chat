@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity  {
 
     // Drawer header Views
     private ImageView mDrawerHeaderAvatar;
-    private TextView mDrawerHeaderUsername;
+    private TextView mDrawerHeaderName;
     private TextView mDrawerHeaderEmail;
 
     private ImageButton mPhotoPickerButton;
@@ -139,6 +139,8 @@ public class MainActivity extends AppCompatActivity  {
 
                 SharedPreferences pref = getApplicationContext().getSharedPreferences("MySharedPreferences", 0); // 0 - for private mode
                 SharedPreferences.Editor editor = pref.edit();
+                editor.putString("name", userInfo.getName());
+                editor.putString("email", userInfo.getEmail());
                 editor.putString("phoneNumber", userInfo.getPhoneNumber());
                 editor.apply();
 
@@ -165,11 +167,14 @@ public class MainActivity extends AppCompatActivity  {
         View listHeaderView = inflater.inflate(R.layout.partial_navigation_drawer_header,null, false);
 
         mDrawerHeaderAvatar = (ImageView) listHeaderView.findViewById(R.id.drawer_header_avatar);
-        mDrawerHeaderUsername = (TextView) listHeaderView.findViewById(R.id.drawer_header_username);
+        mDrawerHeaderName = (TextView) listHeaderView.findViewById(R.id.drawer_header_name);
         mDrawerHeaderEmail = (TextView) listHeaderView.findViewById(R.id.drawer_header_email);
 
-        // TODO dodelish vrednosti ovim treju varijablama, npr. mDrawerHeaderUsername.setText("David Milivojev")
-        mDrawerHeaderUsername.setText(mAuthService.getUser().getEmail());
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("MySharedPreferences", 0); // 0 - for private mode
+        if(pref != null) {
+            mDrawerHeaderName.setText(pref.getString("name", null));
+            mDrawerHeaderEmail.setText(pref.getString("email", null));
+        }
 
         mListView.addHeaderView(listHeaderView);
     }
