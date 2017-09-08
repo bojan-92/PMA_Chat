@@ -12,21 +12,18 @@
     <string name="emailFieldEmptyMessage">Email is empty!</string>
     <string name="passwordFieldEmptyMessage">Password is empty!</string>
     <string name="passwordConfirmFieldEmptyMessage">Password is empty!</string>
-    <string name="firstNameFieldEmptyMessage">First Name is empty!</string>
-    <string name="lastNameFieldEmptyMessage">Last Name is empty!</string>
+    <string name="nameFieldEmptyMessage">Name is empty!</string>
     <string name="phoneNumberFieldEmptyMessage">Phone number is empty!</string>
     <string name="loginFailedMessage">Login Failed!</string>
     <string name="loginGoToSignUp">Don\'t have an account? Sign Up here</string>
     <string name="signUp">Sign Up</string>
     <string name="signUpHeader">Sign Up on PMA Chat</string>
-    <string name="firstName">First name</string>
-    <string name="lastName">Last name</string>
+    <string name="name">Name</string>
     <string name="phoneNumber">Phone Number</string>
     <string name="confirmPassword">Password confirm</string>
     <string name="signUpGoBackToLogin">Back to Login</string>
     <string name="birthdayLabel">Birthday</string>
-    <string name="date_selected"></string>
-    <string name="userStartChat">START CHAT</string>
+    <string name="startChat">Start Chat</string>
     <string name="userFullName">Name: Full name</string>
     <string name="userBirth">Birthday: 1.5.1990.</string>
     <string name="userEditName">Username</string>
@@ -54,9 +51,13 @@
     <string name="failedSavingUserInfoMessage">Saving user info failed!</string>
     <string name="profileSettingsSuccessfullyChanged">Profile settings successfully changed!</string>
     <string name="profileImageSuccessfullyChanged">Profile image successfully changed!</string>
-    <string name="firstNameLabel">First name: </string>
-    <string name="lastNameLabel">Last name: </string>
-    <string name="phoneNumberLabel">Phone Number: </string>
+    <string name="nameLabel">Name:&#160;</string>
+    <string name="firebaseNameLabel">PMA_Chat Name:&#160;</string>
+    <string name="emailLabel">Email:&#160;</string>
+    <string name="phoneNumberLabel">Phone Number:&#160;</string>
     <string name="chatContactProfileTitle">Contact Profile</string>
+    <string name="noInternetConnection">No internet connection</string>
+    <string name="chatsTitle">Chats</string>
+    <string name="chatContactsTitle">Contacts</string>
 
 </resources>

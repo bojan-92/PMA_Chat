@@ -18,19 +18,18 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.pma.chat.pmaChat.R;
+import com.pma.chat.pmaChat.auth.AuthService;
+import com.pma.chat.pmaChat.auth.AuthServiceImpl;
 import com.pma.chat.pmaChat.auth.LoginActivity;
 import com.pma.chat.pmaChat.model.User;
-import com.pma.chat.pmaChat.utils.RemoteConfig;
+import com.pma.chat.pmaChat.sync.MyFirebaseService;
 
 
 public class ProfileSettingsFragment extends Fragment {
@@ -38,20 +37,15 @@ public class ProfileSettingsFragment extends Fragment {
     private static int GALLERY_CODE = 1;
 
     private TextView mLogoutTextView;
-    private EditText mFirstNameEditText;
-    private EditText mLastNameEditText;
+    private EditText mNameEditText;
     private ImageView mProfilePhotoImageView;
     private Button mSaveButton;
-
     private ProgressDialog mProgressDialog;
 
-    private FirebaseAuth mFirebaseAuth;
-    private StorageReference mUsersProfileImagesStorageReference;
-
-    private DatabaseReference mRootDatabaseReference = FirebaseDatabase.getInstance().getReference();
-    private DatabaseReference mUserReference;
-
     private User mUserInfo;
+
+    private StorageReference mUsersProfileImagesStorageReference;
+    private DatabaseReference mUserReference;
 
     @Nullable
     @Override
@@ -59,17 +53,14 @@ public class ProfileSettingsFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_profile_settings, container, false);
 
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mUsersProfileImagesStorageReference = FirebaseStorage.getInstance().getReference().child(RemoteConfig.USERS_PROFILE_PHOTOS_STORAGE);
+        mUsersProfileImagesStorageReference = MyFirebaseService.getUsersProfileImagesStorageReference();
 
-        String userId = mFirebaseAuth.getCurrentUser().getUid();
-        mUserReference = mRootDatabaseReference.child(RemoteConfig.USER).child(userId);
+        mUserReference = MyFirebaseService.getCurrentUserDatabaseReference();
 
         mLogoutTextView = (TextView) view.findViewById(R.id.tvLogout);
         mSaveButton = (Button) view.findViewById(R.id.btnSaveProfileSettings);
 
-        mFirstNameEditText = (EditText) view.findViewById(R.id.txtProfileSettingsFirstName);
-        mLastNameEditText = (EditText) view.findViewById(R.id.txtProfileSettingsLastName);
+        mNameEditText = (EditText) view.findViewById(R.id.txtProfileSettingsName);
         mProfilePhotoImageView = (ImageView) view.findViewById(R.id.imageViewProfile);
 
         mProgressDialog = new ProgressDialog(this.getContext());
@@ -80,8 +71,7 @@ public class ProfileSettingsFragment extends Fragment {
 
                 mUserInfo = dataSnapshot.getValue(User.class);
 
-                mFirstNameEditText.setText(mUserInfo.getFirstName());
-                mLastNameEditText.setText(mUserInfo.getLastName());
+                mNameEditText.setText(mUserInfo.getName());
                 if(mUserInfo.getProfileImageUri() != null) {
                     Glide.with(mProfilePhotoImageView.getContext())
                             .load(mUserInfo.getProfileImageUri())
@@ -98,7 +88,8 @@ public class ProfileSettingsFragment extends Fragment {
         mLogoutTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mFirebaseAuth.signOut();
+                AuthService authService = new AuthServiceImpl();
+                authService.logoutUser();
                 Intent i = new Intent(getActivity().getApplicationContext(), LoginActivity.class);
                 startActivity(i);
             }
@@ -108,15 +99,13 @@ public class ProfileSettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                String firstName = mFirstNameEditText.getText().toString().trim();
-                String lastName = mLastNameEditText.getText().toString().trim();
+                String name = mNameEditText.getText().toString().trim();
 
-                if(!isFormValid(firstName, lastName) || mUserInfo == null) {
+                if(!isFormValid(name) || mUserInfo == null) {
                     return;
                 }
 
-                mUserInfo.setFirstName(firstName);
-                mUserInfo.setLastName(lastName);
+                mUserInfo.setName(name);
 
                 mProgressDialog.setMessage("Saving changes ...");
                 mProgressDialog.show();
@@ -184,13 +173,9 @@ public class ProfileSettingsFragment extends Fragment {
     }
 
 
-    private boolean isFormValid(String firstName, String lastName) {
-        if (TextUtils.isEmpty(firstName)) {
-            Toast.makeText(ProfileSettingsFragment.this.getContext(), R.string.firstNameFieldEmptyMessage, Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        if (TextUtils.isEmpty(lastName)) {
-            Toast.makeText(ProfileSettingsFragment.this.getContext(), R.string.lastNameFieldEmptyMessage, Toast.LENGTH_SHORT).show();
+    private boolean isFormValid(String name) {
+        if (TextUtils.isEmpty(name)) {
+            Toast.makeText(ProfileSettingsFragment.this.getContext(), R.string.nameFieldEmptyMessage, Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;

@@ -9,15 +9,12 @@ public class Chat implements Serializable {
 
     private Long chatContactId;
 
-    private String firebaseChatId;
-
     public Chat() {
     }
 
-    public Chat(Long id, Long chatContactId, String firebaseChatId) {
+    public Chat(Long id, Long chatContactId) {
         this.id = id;
         this.chatContactId = chatContactId;
-        this.firebaseChatId = firebaseChatId;
     }
 
     public Long getId() {
@@ -34,13 +31,5 @@ public class Chat implements Serializable {
 
     public void setChatContactId(Long chatContactId) {
         this.chatContactId = chatContactId;
-    }
-
-    public String getFirebaseChatId() {
-        return firebaseChatId;
-    }
-
-    public void setFirebaseChatId(String firebaseChatId) {
-        this.firebaseChatId = firebaseChatId;
     }
 }

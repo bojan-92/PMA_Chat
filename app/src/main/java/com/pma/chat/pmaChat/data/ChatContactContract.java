@@ -10,6 +10,10 @@ public class ChatContactContract {
 
         public static final String COLUMN_NAME = "name";
 
+        public static final String COLUMN_FIREBASE_NAME = "firebaseName";
+
+        public static final String COLUMN_EMAIL = "email";
+
         public static final String COLUMN_NUMBER = "phoneNumber";
 
         public static final String COLUMN_FIREBASE_USER_ID = "firebaseUserId";

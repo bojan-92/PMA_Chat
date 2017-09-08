@@ -51,6 +51,7 @@ import com.pma.chat.pmaChat.model.ChatContact;
 import com.pma.chat.pmaChat.model.MapModel;
 import com.pma.chat.pmaChat.model.Message;
 import com.pma.chat.pmaChat.model.MessageType;
+import com.pma.chat.pmaChat.sync.MyFirebaseService;
 import com.pma.chat.pmaChat.utils.AppUtils;
 import com.pma.chat.pmaChat.utils.FileUtils;
 import com.pma.chat.pmaChat.utils.RemoteConfig;
@@ -91,8 +92,7 @@ public class ChatActivity extends AppCompatActivity {
     private FirebaseStorage mFirebaseStorage;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
-    private DatabaseReference mRootDatabaseReference = FirebaseDatabase.getInstance().getReference();
-    private DatabaseReference mChatsDatabaseReference = mRootDatabaseReference.child(RemoteConfig.CHAT);
+    private DatabaseReference mChatsDatabaseReference;
     private DatabaseReference mChatDatabaseReference;
     private DatabaseReference mMessagesDatabaseReference;
     private ChildEventListener mChildEventListener;
@@ -128,19 +128,21 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         Intent intent = getIntent();
-      //  mChatContactFirebaseUserId = intent.getStringExtra("CHAT_CONTACT_FIREBASE_USER_ID");
         final ChatContact chatContact = (ChatContact) intent.getSerializableExtra("CHAT_CONTACT");
+
+        mChatContactFirebaseUserId = chatContact.getFirebaseUserId();
 
         mLocalDatabaseInstance = DatabaseHelper.getInstance(getApplicationContext());
 
+        mChatsDatabaseReference = MyFirebaseService.getChatsDatabaseReference();
+
         mAuthService = new AuthServiceImpl();
-        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseAuth = MyFirebaseService.getFirebaseAuthInstance();
 
         mLocalStorageDir = getExternalFilesDir(Environment.DIRECTORY_DCIM);
-        mFirebaseStorage = FirebaseStorage.getInstance();
+        mFirebaseStorage = MyFirebaseService.getFirebaseStorageInstance();
 
         // Initialize references to views
-        mProgressBar = (ProgressBar) findViewById(R.id.chatMessagesProgressBar);
         mMessageEditText = (EditText) findViewById(R.id.chatMessageField);
         mSendMessageButton = (Button) findViewById(R.id.chatMessageSendBtn);
         mMessagesListView = (ListView) findViewById(R.id.chatMessagesList);
@@ -150,16 +152,16 @@ public class ChatActivity extends AppCompatActivity {
         mMapButton = (Button) findViewById(R.id.btnMap);
         mSoundRecordingButton = (Button) findViewById(R.id.btnSoundRecording);
         mStickerButton = (Button) findViewById(R.id.btnStick);
+        // Initialize progress bar
+        mProgressBar = (ProgressBar) findViewById(R.id.chatMessagesProgressBar);
+        mProgressBar.setVisibility(ProgressBar.INVISIBLE);
 
         // Initialize message ListView and its adapter
         List<Message> messages = new ArrayList<>();
         mMessageAdapter = new ChatMessageListAdapter(this, R.layout.item_chat_message_friend, messages);
         mMessagesListView.setAdapter(mMessageAdapter);
 
-        // Initialize progress bar
-        mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-
-        final String userId = mFirebaseAuth.getCurrentUser().getUid();
+        final String userId = mAuthService.getUserId();
 
         final Query findChatQuery1 = mChatsDatabaseReference.orderByChild(RemoteConfig.CHAT_UNIQUE_MARK).equalTo(userId + "_" + mChatContactFirebaseUserId);
         final Query findChatQuery2 = mChatsDatabaseReference.orderByChild(RemoteConfig.CHAT_UNIQUE_MARK).equalTo(mChatContactFirebaseUserId + "_" + userId);

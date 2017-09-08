@@ -14,6 +14,5 @@ public class ChatContract {
 
         public static final String COLUMN_CHAT_CONTACT_ID = "chatContactId";
 
-        public static final String COLUMN_FIREBASE_CHAT_ID = "firebaseChatId";
     }
 }

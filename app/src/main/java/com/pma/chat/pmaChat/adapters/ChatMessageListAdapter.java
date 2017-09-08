@@ -3,30 +3,27 @@ package com.pma.chat.pmaChat.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.pma.chat.pmaChat.R;
+import com.pma.chat.pmaChat.auth.AuthService;
+import com.pma.chat.pmaChat.auth.AuthServiceImpl;
 import com.pma.chat.pmaChat.model.Message;
 import com.pma.chat.pmaChat.model.User;
-import com.pma.chat.pmaChat.utils.RemoteConfig;
+import com.pma.chat.pmaChat.sync.MyFirebaseService;
 
 import java.util.List;
 
@@ -43,7 +40,6 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
 
     private ImageView mProfilePhotoImageView;
 
-    private DatabaseReference mRootDatabaseReference = FirebaseDatabase.getInstance().getReference();
     private DatabaseReference mUserReference;
 
     private static final int TYPES_COUNT = 2;
@@ -52,11 +48,13 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
 
     private Context mContext;
 
-    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private FirebaseUser mUser;
 
     public ChatMessageListAdapter(Context context, int resource, List<Message> objects) {
         super(context, resource, objects);
         mContext = context;
+        AuthService authService = new AuthServiceImpl();
+        mUser = authService.getUser();
     }
 
     @Override
@@ -66,7 +64,7 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
 
     @Override
     public int getItemViewType (int position) {
-        if (getItem(position).getSenderId().equals(user.getUid())) {
+        if (getItem(position).getSenderId().equals(mUser.getUid())) {
             return TYPE_ME;
         }
         return TYPE_FRIEND;
@@ -96,7 +94,7 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
 
         Message message = getItem(position);
 
-        mUserReference = mRootDatabaseReference.child(RemoteConfig.USER).child(message.getSenderId());
+        mUserReference = MyFirebaseService.getUserDatabaseReferenceById(message.getSenderId());
 
         if(message.getType() == null) {
             mMessageContentTextView.setVisibility(View.VISIBLE);

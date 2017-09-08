@@ -9,10 +9,10 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="@color/colorAccent"
-        android:contextClickable="true"
         android:gravity="center_vertical"
         android:text="@string/userTitleEdit"
         android:textAlignment="center"
+        android:textAllCaps="true"
         android:textColor="#FFF" />
 
     <ImageView
@@ -24,7 +24,7 @@
         android:background="@color/colorPrimaryDark" />
 
     <EditText
-        android:id="@+id/txtProfileSettingsFirstName"
+        android:id="@+id/txtProfileSettingsName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
@@ -32,44 +32,8 @@
         android:layout_marginTop="19dp"
         android:ems="10"
         android:text=""
-        android:hint="@string/firstName"
+        android:hint="@string/name"
         android:inputType="text" />
-
-    <EditText
-        android:id="@+id/txtProfileSettingsLastName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/txtProfileSettingsFirstName"
-        android:layout_marginTop="11dp"
-        android:ems="10"
-        android:text=""
-        android:hint="@string/lastName"
-        android:inputType="text" />
-
-    <!--<EditText-->
-        <!--android:id="@+id/txtSignUpEmail"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentStart="true"-->
-        <!--android:layout_below="@+id/txtProfileSettingsLastName"-->
-        <!--android:layout_marginTop="14dp"-->
-        <!--android:ems="10"-->
-        <!--android:hint="@string/loginEmail"-->
-        <!--android:padding="5dp"-->
-        <!--android:inputType="textEmailAddress" />-->
-
-    <!--<EditText-->
-        <!--android:id="@+id/txtPhoneNumber"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentStart="true"-->
-        <!--android:layout_below="@+id/txtSignUpEmail"-->
-        <!--android:layout_marginTop="12dp"-->
-        <!--android:ems="10"-->
-        <!--android:padding="5dp"-->
-        <!--android:hint="phone"-->
-        <!--android:inputType="phone" />-->
 
     <Button
         android:id="@+id/btnSaveProfileSettings"

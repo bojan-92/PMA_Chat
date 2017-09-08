@@ -13,11 +13,6 @@ import android.widget.GridView;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.adapters.StickerAdapter;
 
-
-/**
- * Created by david on 8/17/17.
- */
-
 public class StickerActivity extends AppCompatActivity {
 
     private GridView mGridView;

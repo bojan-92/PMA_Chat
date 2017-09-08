@@ -1,9 +1,5 @@
 package com.pma.chat.pmaChat.model;
 
-/**
- * Created by Bojan on 6/15/2017.
- */
-
 public class MapModel {
     private String latitude;
     private String longitude;

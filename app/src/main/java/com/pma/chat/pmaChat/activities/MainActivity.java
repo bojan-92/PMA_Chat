@@ -1,6 +1,7 @@
 package com.pma.chat.pmaChat.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -27,6 +28,8 @@ import com.google.firebase.storage.StorageReference;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.adapters.DrawerListAdapter;
 import com.pma.chat.pmaChat.adapters.StickerAdapter;
+import com.pma.chat.pmaChat.auth.AuthService;
+import com.pma.chat.pmaChat.auth.AuthServiceImpl;
 import com.pma.chat.pmaChat.auth.LoginActivity;
 import com.pma.chat.pmaChat.fragments.ChatListFragment;
 import com.pma.chat.pmaChat.model.NavItem;
@@ -35,6 +38,7 @@ import com.pma.chat.pmaChat.fragments.ChatContactListFragment;
 import com.pma.chat.pmaChat.fragments.ChatContactProfileFragment;
 import com.pma.chat.pmaChat.fragments.ProfileSettingsFragment;
 import com.pma.chat.pmaChat.model.User;
+import com.pma.chat.pmaChat.sync.MyFirebaseService;
 import com.pma.chat.pmaChat.utils.RemoteConfig;
 
 import java.util.ArrayList;
@@ -48,6 +52,7 @@ public class MainActivity extends AppCompatActivity  {
 
     private DrawerLayout mDrawerLayout;
     private DrawerListAdapter mListAdapter;
+
     // Drawer header Views
     private ImageView mDrawerHeaderAvatar;
     private TextView mDrawerHeaderUsername;
@@ -55,11 +60,11 @@ public class MainActivity extends AppCompatActivity  {
 
     private ImageButton mPhotoPickerButton;
 
-    private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
-    private DatabaseReference mRootDatabaseReference = FirebaseDatabase.getInstance().getReference();
     private DatabaseReference mUserReference;
+
+    private AuthService mAuthService;
 
 
     @Override
@@ -68,20 +73,21 @@ public class MainActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mAuthService = new AuthServiceImpl();
+
+        if(mAuthService.getUser() == null){
+            finish();
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+            return;
+        }
+
         DatabaseHelper db = DatabaseHelper.getInstance(this.getApplicationContext());
 
         db.getWritableDatabase();
 
         initDrawerListItems(mNavItems);
 
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        String userId = mFirebaseAuth.getCurrentUser().getUid();
-        mUserReference = mRootDatabaseReference.child(RemoteConfig.USER).child(userId);
-
-        if(mFirebaseAuth.getCurrentUser() == null){
-            finish();
-            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-        }
+        mUserReference = MyFirebaseService.getCurrentUserDatabaseReference();
 
         mListView = (ListView) findViewById(R.id.listview);
 
@@ -91,30 +97,32 @@ public class MainActivity extends AppCompatActivity  {
         mListView.setAdapter(mListAdapter);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
 
+        Fragment fragment = new ChatListFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.relativeLayout, fragment).commit();
+        mDrawerLayout.closeDrawers();
+
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Fragment fragment;
                 switch (position){
                     case 1:
-                        fragment = new ChatContactListFragment();
+                        fragment = new ChatListFragment();
                         break;
                     case 2:
-                        fragment = new ChatListFragment();
+                        fragment = new ChatContactListFragment();
                         break;
                     case 3:
                         fragment = new ProfileSettingsFragment();
                         break;
                     case 4:
-                        fragment = new ChatContactProfileFragment();
-                        break;
-                    case 5:
-                        mFirebaseAuth.signOut();
+                        mAuthService.logoutUser();
                         Intent i = new Intent(MainActivity.this.getApplicationContext(), LoginActivity.class);
                         startActivity(i);
                         return;
                     default:
-                        fragment = new ChatContactListFragment();
+                        fragment = new ChatListFragment();
                         break;
                 }
                 FragmentManager fragmentManager = getSupportFragmentManager();
@@ -128,6 +136,11 @@ public class MainActivity extends AppCompatActivity  {
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 User userInfo = dataSnapshot.getValue(User.class);
+
+                SharedPreferences pref = getApplicationContext().getSharedPreferences("MySharedPreferences", 0); // 0 - for private mode
+                SharedPreferences.Editor editor = pref.edit();
+                editor.putString("phoneNumber", userInfo.getPhoneNumber());
+                editor.apply();
 
                 if(userInfo.getProfileImageUri() != null) {
                     Glide.with(mDrawerHeaderAvatar.getContext())
@@ -156,7 +169,7 @@ public class MainActivity extends AppCompatActivity  {
         mDrawerHeaderEmail = (TextView) listHeaderView.findViewById(R.id.drawer_header_email);
 
         // TODO dodelish vrednosti ovim treju varijablama, npr. mDrawerHeaderUsername.setText("David Milivojev")
-        mDrawerHeaderUsername.setText(mFirebaseAuth.getCurrentUser().getEmail());
+        mDrawerHeaderUsername.setText(mAuthService.getUser().getEmail());
 
         mListView.addHeaderView(listHeaderView);
     }
@@ -167,12 +180,10 @@ public class MainActivity extends AppCompatActivity  {
      * @param mNavItems The list of items in the navigation drawer.
      */
     private void initDrawerListItems(List<NavItem> mNavItems ){
-        mNavItems.add(new NavItem(getString(R.string.friendsList), R.drawable.ic_two_users));
         mNavItems.add(new NavItem(getString(R.string.chatList), R.drawable.ic_startchat));
+        mNavItems.add(new NavItem(getString(R.string.friendsList), R.drawable.ic_two_users));
         mNavItems.add(new NavItem(getString(R.string.edit_profile_settings), R.drawable.ic_settings));
-        mNavItems.add(new NavItem(getString(R.string.myProfile), R.drawable.ic_avatar));
         mNavItems.add(new NavItem(getString(R.string.logout), R.drawable.ic_cancel));
-
     }
 
 }

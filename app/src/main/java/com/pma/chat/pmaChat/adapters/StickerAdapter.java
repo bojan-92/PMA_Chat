@@ -1,9 +1,5 @@
 package com.pma.chat.pmaChat.adapters;
 
-/**
- * Created by david on 8/17/17.
- */
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.view.View;

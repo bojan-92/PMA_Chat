@@ -15,10 +15,6 @@ import com.pma.chat.pmaChat.data.DatabaseHelper;
 import com.pma.chat.pmaChat.model.Chat;
 import com.pma.chat.pmaChat.model.ChatContact;
 
-/**
- * Created by Mix on 9/4/17.
- */
-
 public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ChatsAdapterViewHolder> {
 
     private DatabaseHelper mLocalDatabaseInstance;

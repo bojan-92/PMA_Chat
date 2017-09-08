@@ -10,17 +10,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.VideoView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.pma.chat.pmaChat.R;
+import com.pma.chat.pmaChat.auth.AuthService;
+import com.pma.chat.pmaChat.auth.AuthServiceImpl;
 import com.pma.chat.pmaChat.model.Chat;
 import com.pma.chat.pmaChat.model.Message;
 
 import java.util.List;
-
-/**
- * Created by Mix on 9/4/17.
- */
 
 public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ChatMessagesAdapterViewHolder> {
 
@@ -29,11 +26,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ChatMe
     private static final int TYPE_FRIEND = 1;
 
     private List<Message> mMessages;
-
-    private final Context mContext;
-
     private FirebaseUser mUser;
 
+    private final Context mContext;
     private final ChatMessagesAdapterOnClickHandler mClickHandler;
 
     public interface ChatMessagesAdapterOnClickHandler {
@@ -45,7 +40,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ChatMe
     public MessagesAdapter(Context context, ChatMessagesAdapterOnClickHandler clickHandler) {
         mContext = context;
         mClickHandler = clickHandler;
-        mUser = FirebaseAuth.getInstance().getCurrentUser();
+        AuthService authService = new AuthServiceImpl();
+        mUser = authService.getUser();
     }
 
     @Override
@@ -53,7 +49,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ChatMe
         Message message = mMessages.get(position);
         return (mUser.getUid().equals(message.getSenderId())) ? TYPE_ME : TYPE_FRIEND;
     }
-
 
     @Override
     public ChatMessagesAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
@@ -125,7 +120,6 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ChatMe
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
             mCursor.moveToPosition(adapterPosition);
-
 
         }
     }

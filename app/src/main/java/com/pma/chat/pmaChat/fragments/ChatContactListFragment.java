@@ -1,27 +1,21 @@
 package com.pma.chat.pmaChat.fragments;
 
 import android.content.DialogInterface;
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -31,18 +25,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.pma.chat.pmaChat.R;
-import com.pma.chat.pmaChat.activities.ChatActivity;
 import com.pma.chat.pmaChat.adapters.ChatContactsAdapter;
 import com.pma.chat.pmaChat.data.DatabaseHelper;
 import com.pma.chat.pmaChat.data.PhoneContactListProvider;
 import com.pma.chat.pmaChat.model.ChatContact;
 import com.pma.chat.pmaChat.model.PhoneContact;
 import com.pma.chat.pmaChat.model.User;
+import com.pma.chat.pmaChat.sync.MyFirebaseService;
 import com.pma.chat.pmaChat.utils.Converters;
-import com.pma.chat.pmaChat.utils.RemoteConfig;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class ChatContactListFragment extends Fragment implements
@@ -54,16 +48,15 @@ public class ChatContactListFragment extends Fragment implements
 
     private List<PhoneContact> mPhoneContacts;
 
-    private DatabaseReference mRootDatabaseReference = FirebaseDatabase.getInstance().getReference();
-    private DatabaseReference mUserDatabaseReference = mRootDatabaseReference.child(RemoteConfig.USER);
+    private DatabaseReference mUsersDatabaseReference;
 
     private DatabaseHelper mLocalDatabaseInstance;
 
-    private ChatContactsAdapter mChatContactsAdapter;
     private RecyclerView mRecyclerView;
-    private int mPosition = RecyclerView.NO_POSITION;
-
     private ProgressBar mProgressBar;
+
+    private ChatContactsAdapter mChatContactsAdapter;
+    private int mPosition = RecyclerView.NO_POSITION;
 
 
     @Nullable
@@ -76,8 +69,9 @@ public class ChatContactListFragment extends Fragment implements
 
         mLocalDatabaseInstance = DatabaseHelper.getInstance(getActivity().getApplicationContext());
 
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_chat_contacts);
+        mUsersDatabaseReference = MyFirebaseService.getUsersDatabaseReference();
 
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_chat_contacts);
         mProgressBar = (ProgressBar) view.findViewById(R.id.pb_chat_contacts);
         mProgressBar.setVisibility(ProgressBar.VISIBLE);
 
@@ -89,21 +83,21 @@ public class ChatContactListFragment extends Fragment implements
 
         connectedRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                boolean connected = snapshot.getValue(Boolean.class);
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                boolean connected = dataSnapshot.getValue(Boolean.class);
                 if (connected) {
-                    Toast.makeText(getActivity(), "Connected", Toast.LENGTH_SHORT);
+                //    Toast.makeText(getContext(), "Connected", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getActivity(), "Not connected", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Not connected", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
+            public void onCancelled(DatabaseError databaseError) {
             }
         });
 
-        mUserDatabaseReference.addValueEventListener(new ValueEventListener() {
+        mUsersDatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -116,8 +110,7 @@ public class ChatContactListFragment extends Fragment implements
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getContext(), "Server error", Toast.LENGTH_SHORT)
-                        .show();
+//                Toast.makeText(getContext(), "Server error", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -182,32 +175,33 @@ public class ChatContactListFragment extends Fragment implements
         mPhoneContacts = contactListProvider.fetchAll();
     }
 
-
     @Override
     public void onClick(ChatContact chatContact) {
-
-        Intent chatIntent = new Intent(getContext(), ChatActivity.class);
-        chatIntent.putExtra("CHAT_CONTACT", chatContact);
-        startActivity(chatIntent);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("CHAT_CONTACT", chatContact);
+        ChatContactProfileFragment chatContactProfileFragment = new ChatContactProfileFragment();
+        chatContactProfileFragment.setArguments(bundle);
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.relativeLayout, chatContactProfileFragment).commit();
     }
-
 
     private void updateChatContacts(DataSnapshot dataSnapshot) {
 
-        ArrayList<String> phoneNumbers = new ArrayList<>();
+        SharedPreferences pref = getContext().getApplicationContext().getSharedPreferences("MySharedPreferences", 0); // 0 - for private mode
+        String loggedInUserPhoneNumber = pref.getString("phoneNumber", null);
+
+        Map<String, String> phoneNumbersWithNames = new HashMap<>();
 
         for(PhoneContact phoneContact : mPhoneContacts) {
             String phoneNumber = phoneContact.getPhoneNumber().replace("(", "").replace(")", "").replace("-", "").replace(" ", "");
-            phoneNumbers.add(phoneNumber);
+            phoneNumbersWithNames.put(phoneNumber, phoneContact.getDisplayName());
         }
-
-        ArrayList<String> chatContacts = new ArrayList<>();
 
         for (DataSnapshot data : dataSnapshot.getChildren()) {
             User user = data.getValue(User.class);
-            if(phoneNumbers.contains(user.getPhoneNumber())) {
-                chatContacts.add(user.getFirstName() + " " + user.getLastName());
+            if(phoneNumbersWithNames.containsKey(user.getPhoneNumber()) && !user.getPhoneNumber().equals(loggedInUserPhoneNumber)) {
                 ChatContact chatContact = Converters.userToChatContact(user);
+                chatContact.setName(phoneNumbersWithNames.get(user.getPhoneNumber()));
                 chatContact.setFirebaseUserId(data.getKey());
                 mLocalDatabaseInstance.addOrUpdateChatContact(chatContact);
             }

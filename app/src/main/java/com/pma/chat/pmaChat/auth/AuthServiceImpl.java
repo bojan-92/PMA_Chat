@@ -6,6 +6,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -16,18 +17,23 @@ public class AuthServiceImpl implements AuthService {
 
     private FirebaseAuth mFirebaseAuth;
 
-    private DatabaseReference mFirebaseDatabaseRef;
+    private DatabaseReference mFirebaseRootDatabaseRef;
 
 
     public AuthServiceImpl() {
         mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseDatabaseRef = FirebaseDatabase.getInstance().getReference();
+        mFirebaseRootDatabaseRef = FirebaseDatabase.getInstance().getReference();
     }
 
     @Override
     public boolean isUserLoggedIn() {
 
         return mFirebaseAuth.getCurrentUser() != null;
+    }
+
+    @Override
+    public FirebaseUser getUser() {
+        return FirebaseAuth.getInstance().getCurrentUser();
     }
 
     @Override
@@ -60,7 +66,7 @@ public class AuthServiceImpl implements AuthService {
                         if (task.isSuccessful()) {
 
                             String userId = mFirebaseAuth.getCurrentUser().getUid();
-                            DatabaseReference currentUserRef = mFirebaseDatabaseRef.child(RemoteConfig.USER).child(userId);
+                            DatabaseReference currentUserRef = mFirebaseRootDatabaseRef.child(RemoteConfig.USER).child(userId);
 
                             currentUserRef.setValue(user, new DatabaseReference.CompletionListener() {
                                 @Override
@@ -74,5 +80,10 @@ public class AuthServiceImpl implements AuthService {
                         }
                     }
                 });
+    }
+
+    @Override
+    public void logoutUser() {
+        mFirebaseAuth.signOut();
     }
 }

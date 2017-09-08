@@ -5,27 +5,27 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/chatContactsTitle"
+        android:id="@+id/chatsTitle"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="@color/colorAccent"
         android:gravity="center_vertical"
-        android:text="@string/chatContactsTitle"
+        android:text="@string/chatsTitle"
         android:textAlignment="center"
         android:textAllCaps="true"
         android:textColor="#FFF" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_chat_contacts"
+        android:id="@+id/rv_chats"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/chatContactsTitle"
+        android:layout_below="@+id/chatsTitle"
         android:clipToPadding="false"
         android:paddingBottom="8dp"/>
 
     <!-- A progress bar that will be shown to users to indicate that weather data is loading -->
     <ProgressBar
-        android:id="@+id/pb_chat_contacts"
+        android:id="@+id/pb_chats"
         android:layout_width="42dp"
         android:layout_height="42dp"
         android:layout_gravity="center"
