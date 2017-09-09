@@ -32,8 +32,8 @@
     <string name="userEditBirth">Birthday</string>
     <string name="userEdit">EDIT</string>
     <string name="userTitleEdit">EDIT PROFILE</string>
-    <string name="friendsList">Friends List</string>
-    <string name="chatList">Chat List</string>
+    <string name="friendsList">Contacts</string>
+    <string name="chatList">Chats</string>
     <string name="myProfile">Profile</string>
     <string name="change_picture">Change picture</string>
     <string name="edit_profile_settings">Edit profile settings</string>
