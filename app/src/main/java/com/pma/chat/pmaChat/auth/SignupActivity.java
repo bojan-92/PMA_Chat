@@ -1,9 +1,11 @@
 package com.pma.chat.pmaChat.auth;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -25,6 +27,7 @@ import com.pma.chat.pmaChat.model.User;
 import java.util.concurrent.TimeUnit;
 
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.pma.chat.pmaChat.utils.AppUtils;
 
 
 public class SignupActivity extends Activity {
@@ -33,8 +36,6 @@ public class SignupActivity extends Activity {
     private EditText mPhoneNumberEditText;
     private Button mSignUpButton;
     private ProgressDialog progressDialog;
-
-    private String mPhoneNumber;
 
     private AuthService mAuthService;
 
@@ -54,23 +55,57 @@ public class SignupActivity extends Activity {
         mPhoneNumberEditText = (EditText) findViewById(R.id.txtPhoneNumber);
         progressDialog = new ProgressDialog(this);
 
-        TelephonyManager telephonyManager = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
-        mPhoneNumber = telephonyManager.getLine1Number();
-        mPhoneNumberEditText.setText(mPhoneNumber);
-        mPhoneNumberEditText.setEnabled(false);
+//        if(AppUtils.isPermissionGrunted(this, Manifest.permission.READ_PHONE_STATE)) {
+//            readPhoneNumber();
+//            mPhoneNumberEditText.setText(mPhoneNumber);
+//            mPhoneNumberEditText.setEnabled(false);
+//        } else {
+//            AppUtils.gruntPermission(this, android.Manifest.permission.READ_PHONE_STATE, "You need to allow access to Phone Number");
+//        }
 
         mSignUpButton = (Button) findViewById(R.id.btnSignUp);
 
         mSignUpButton.setOnClickListener(signUpOnClickListener);
     }
 
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+//        switch (requestCode) {
+//            case AppUtils.REQUEST_CODE_ASK_PERMISSIONS:
+//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    // Permission Granted
+//                    readPhoneNumber();
+//                    mPhoneNumberEditText.setText(mPhoneNumber);
+//                    mPhoneNumberEditText.setEnabled(false);
+//                } else {
+//                    // Permission Denied
+//                    Toast.makeText(this, "READ_PHONE_STATE Denied", Toast.LENGTH_SHORT)
+//                            .show();
+//                }
+//                break;
+//            default:
+//                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        }
+//    }
+
+//    void readPhoneNumber() {
+//        TelephonyManager telephonyManager = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+//        mPhoneNumber = telephonyManager.getLine1Number();
+//        if(mPhoneNumber.equals("")){
+//            Toast.makeText(this, "Set your phone number in Settings -> About Phone -> Status -> My phone Number", Toast.LENGTH_SHORT)
+//                    .show();
+//            finish();
+//        }
+//    }
+
     private View.OnClickListener signUpOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
 
             String name = mNameEditText.getText().toString().trim();
+            String password = mPhoneNumberEditText.getText().toString().trim();
 
-            if (!isFormValid(name)) {
+            if (!isFormValid(name, password)) {
                 return;
             }
 
@@ -78,10 +113,10 @@ public class SignupActivity extends Activity {
             progressDialog.setMessage("Registering User ...");
             progressDialog.show();
 
-            User userInfo = new User(name, mPhoneNumber, null);
+            User userInfo = new User(name, password, null);
 
             PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                    "+381654429183",        // Phone number to verify
+                    password,        // Phone number to verify
                     60,    // Timeout duration
                     TimeUnit.SECONDS,   // Unit of timeout
                     mThis,               // Activity (for callback binding)
@@ -158,9 +193,13 @@ public class SignupActivity extends Activity {
         }
     };
 
-    private boolean isFormValid(String name) {
+    private boolean isFormValid(String name, String password) {
         if (TextUtils.isEmpty(name)) {
             Toast.makeText(SignupActivity.this, R.string.nameFieldEmptyMessage, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (TextUtils.isEmpty(password)) {
+            Toast.makeText(SignupActivity.this, R.string.passwordFieldEmptyMessage, Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;

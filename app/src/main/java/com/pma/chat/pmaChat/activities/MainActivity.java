@@ -1,9 +1,11 @@
 package com.pma.chat.pmaChat.activities;
 
+import android.Manifest;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -41,6 +43,7 @@ import com.pma.chat.pmaChat.fragments.ChatContactListFragment;
 import com.pma.chat.pmaChat.fragments.ProfileSettingsFragment;
 import com.pma.chat.pmaChat.model.User;
 import com.pma.chat.pmaChat.sync.MyFirebaseService;
+import com.pma.chat.pmaChat.utils.AppUtils;
 import com.pma.chat.pmaChat.utils.ConnectionService;
 
 import java.net.MalformedURLException;
@@ -89,9 +92,6 @@ public class MainActivity extends AppCompatActivity implements ConnectionService
         mDrawerAdapter = new DrawerListAdapter(this, mDrawerItems);
         mDrawerListView.setAdapter(mDrawerAdapter);
 
-        TelephonyManager telephonyManager = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
-        mPhoneNumber = telephonyManager.getLine1Number();
-
     }
 
     @Override
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionService
         }
 
         mAuthService = new AuthServiceImpl();
-        mAuthService.logoutUser();
+
         if(mAuthService.getUser() == null) {
             mUsersReference = MyFirebaseService.getUsersDatabaseReference();
             finish();
@@ -145,11 +145,6 @@ public class MainActivity extends AppCompatActivity implements ConnectionService
                 case 3:
                     fragment = new ProfileSettingsFragment();
                     break;
-//                case 4:
-//                    mAuthService.logoutUser();
-//                    Intent i = new Intent(MainActivity.this.getApplicationContext(), LoginActivity.class);
-//                    startActivity(i);
-//                    return;
                 default:
                     fragment = new ChatListFragment();
                     break;
@@ -199,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionService
         SharedPreferences pref = getApplicationContext().getSharedPreferences("MySharedPreferences", 0); // 0 - for private mode
         if(pref != null) {
             mDrawerHeaderName.setText(pref.getString("name", null));
-            mDrawerHeaderPhoneNumber.setText(mPhoneNumber);
+            mDrawerHeaderPhoneNumber.setText(pref.getString("phoneNumber", null));
         }
 
         mDrawerListView.addHeaderView(listHeaderView);

@@ -45,7 +45,7 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/txtName"
         android:ems="10"
-        android:hint="Number for ex: 0643332211"
+        android:hint="Number for ex: +381643332211"
         android:inputType="phone"
         android:textAlignment="center"/>
 

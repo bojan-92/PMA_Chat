@@ -32,6 +32,7 @@ import com.pma.chat.pmaChat.model.ChatContact;
 import com.pma.chat.pmaChat.model.PhoneContact;
 import com.pma.chat.pmaChat.model.User;
 import com.pma.chat.pmaChat.sync.MyFirebaseService;
+import com.pma.chat.pmaChat.utils.AppUtils;
 import com.pma.chat.pmaChat.utils.Converters;
 
 import java.util.HashMap;
@@ -41,8 +42,6 @@ import java.util.Map;
 
 public class ChatContactListFragment extends Fragment implements
         ChatContactsAdapter.ChatContactsAdapterOnClickHandler  {
-
-    private final int REQUEST_CODE_ASK_PERMISSIONS = 123;
 
    // private static final int ID_CHAT_CONTACTS_LOADER = 11;
 
@@ -75,9 +74,11 @@ public class ChatContactListFragment extends Fragment implements
         mProgressBar = (ProgressBar) view.findViewById(R.id.pb_chat_contacts);
         mProgressBar.setVisibility(ProgressBar.VISIBLE);
 
-       // getActivity().getSupportLoaderManager().initLoader(ID_CHAT_CONTACTS_LOADER, null, this);
-
-        readContactsWrapper();
+        if(AppUtils.isPermissionGrunted(this.getActivity(), android.Manifest.permission.READ_CONTACTS)) {
+            readContacts();
+        } else {
+            AppUtils.gruntPermission(this.getActivity(), android.Manifest.permission.READ_CONTACTS, "You need to allow access to Contacts");
+        }
 
         DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
 
@@ -118,31 +119,6 @@ public class ChatContactListFragment extends Fragment implements
 
     }
 
-    private void readContactsWrapper() {
-        int hasReadContactsPermission = ContextCompat.checkSelfPermission(getActivity(),
-                android.Manifest.permission.READ_CONTACTS);
-        if (hasReadContactsPermission != PackageManager.PERMISSION_GRANTED) {
-            if (!ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-                    android.Manifest.permission.READ_CONTACTS)) {
-                showMessageOKCancel("You need to allow access to Contacts",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                ActivityCompat.requestPermissions(getActivity(),
-                                        new String[] {android.Manifest.permission.READ_CONTACTS},
-                                        REQUEST_CODE_ASK_PERMISSIONS);
-                            }
-                        });
-                return;
-            }
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[] {android.Manifest.permission.READ_CONTACTS},
-                    REQUEST_CODE_ASK_PERMISSIONS);
-            return;
-        }
-        readContacts();
-    }
-
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
         new AlertDialog.Builder(this.getActivity())
                 .setMessage(message)
@@ -155,7 +131,7 @@ public class ChatContactListFragment extends Fragment implements
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
-            case REQUEST_CODE_ASK_PERMISSIONS:
+            case AppUtils.REQUEST_CODE_ASK_PERMISSIONS:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission Granted
                     readContacts();
