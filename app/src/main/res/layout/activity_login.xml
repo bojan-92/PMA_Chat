@@ -58,18 +58,6 @@
         android:background="@color/colorAccent"
         android:text="@string/login" />
 
-    <!--<TextView-->
-        <!--android:id="@+id/tvGoToSignUp"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignStart="@+id/loginBtn"-->
-        <!--android:layout_below="@+id/loginBtn"-->
-        <!--android:layout_marginTop="25px"-->
-        <!--android:text="@string/loginGoToSignUp"-->
-        <!--android:textAlignment="center" />-->
-
-
-
     <TextView
         android:id="@+id/tvGoToSignUp"
         android:layout_width="match_parent"
@@ -78,7 +66,6 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:text="@string/loginGoToSignUp"
-        android:textAlignment="center"
-        />
+        android:textAlignment="center" />
 
 </RelativeLayout>

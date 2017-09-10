@@ -64,24 +64,19 @@ public class ChatListFragment extends Fragment implements
         mChatsDatabaseReference = MyFirebaseService.getChatsDatabaseReference();
         mUsersDatabaseReference = MyFirebaseService.getUsersDatabaseReference();
 
-        mChatsDatabaseReference.addValueEventListener(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                updateChats(dataSnapshot);
-
-                loadChats();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // if there is no internet, just load chats from local database
-       //         loadChats();
-            }
-        });
-
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mChatsDatabaseReference.addValueEventListener(chatsValueEventListener);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mChatsDatabaseReference.removeEventListener(chatsValueEventListener);
     }
 
     private void updateChats(DataSnapshot dataSnapshot) {
@@ -89,7 +84,8 @@ public class ChatListFragment extends Fragment implements
         final String currentUserId = mAuthService.getUserId();
 
         for(DataSnapshot data : dataSnapshot.getChildren()) {
-            String userIdsPair = data.child("user1_user2").getValue(String.class);
+            final String chatId = data.getKey();
+            final String userIdsPair = data.child("user1_user2").getValue(String.class);
             String[] chatIdParts = userIdsPair.split("_");
             String userId1 = chatIdParts[0];
             String userId2 = chatIdParts[1];
@@ -105,6 +101,7 @@ public class ChatListFragment extends Fragment implements
                             mLocalDatabaseInstance.addOrUpdateChatContact(chatContact);
                             Chat chat = new Chat();
                             chat.setChatContactId(chatContact.getId());
+                            chat.setFirebaseId(chatId);
                             mLocalDatabaseInstance.addOrUpdateChat(chat);
                         }
 
@@ -149,10 +146,10 @@ public class ChatListFragment extends Fragment implements
 
     @Override
     public void onClick(Chat chat) {
-        Bundle bundle = new Bundle();
-        ChatContact chatContact = mLocalDatabaseInstance.getChatContactById(chat.getChatContactId());
+        //ChatContact chatContact = mLocalDatabaseInstance.getChatContactById(chat.getChatContactId());
         Intent chatIntent = new Intent(getContext(), ChatActivity.class);
-        chatIntent.putExtra("CHAT_CONTACT", chatContact);
+        //chatIntent.putExtra("CHAT_CONTACT", chatContact);
+        chatIntent.putExtra("CHAT_ID", chat.getFirebaseId());
         startActivity(chatIntent);
     }
 
@@ -162,6 +159,23 @@ public class ChatListFragment extends Fragment implements
         /* Finally, make sure the weather data is visible */
         mRecyclerView.setVisibility(View.VISIBLE);
     }
+
+    private ValueEventListener chatsValueEventListener = new ValueEventListener() {
+
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+
+            updateChats(dataSnapshot);
+
+            loadChats();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+            // if there is no internet, just load chats from local database
+            //         loadChats();
+        }
+    };
 }
 
 

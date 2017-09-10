@@ -45,6 +45,7 @@ import com.pma.chat.pmaChat.adapters.ChatMessageListAdapter;
 import com.pma.chat.pmaChat.auth.AuthService;
 import com.pma.chat.pmaChat.auth.AuthServiceImpl;
 import com.pma.chat.pmaChat.auth.LoginActivity;
+import com.pma.chat.pmaChat.auth.SignupActivity;
 import com.pma.chat.pmaChat.data.DatabaseHelper;
 import com.pma.chat.pmaChat.model.Chat;
 import com.pma.chat.pmaChat.model.ChatContact;
@@ -127,178 +128,25 @@ public class ChatActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_chat);
 
+        initServices();
+        bindUIComponents();
+
         Intent intent = getIntent();
-        final ChatContact chatContact = (ChatContact) intent.getSerializableExtra("CHAT_CONTACT");
-
-        mChatContactFirebaseUserId = chatContact.getFirebaseUserId();
-
-        mLocalDatabaseInstance = DatabaseHelper.getInstance(getApplicationContext());
-
-        mChatsDatabaseReference = MyFirebaseService.getChatsDatabaseReference();
-
-        mAuthService = new AuthServiceImpl();
-        mFirebaseAuth = MyFirebaseService.getFirebaseAuthInstance();
-
-        mLocalStorageDir = getExternalFilesDir(Environment.DIRECTORY_DCIM);
-        mFirebaseStorage = MyFirebaseService.getFirebaseStorageInstance();
-
-        // Initialize references to views
-        mMessageEditText = (EditText) findViewById(R.id.chatMessageField);
-        mSendMessageButton = (Button) findViewById(R.id.chatMessageSendBtn);
-        mMessagesListView = (ListView) findViewById(R.id.chatMessagesList);
-        mPhotoPickerButton = (ImageButton) findViewById(R.id.photoPickerButton);
-        mCameraButton = (Button) findViewById(R.id.btnCamera);
-        mCameraVideoButton = (Button) findViewById(R.id.btnCameraVideo);
-        mMapButton = (Button) findViewById(R.id.btnMap);
-        mSoundRecordingButton = (Button) findViewById(R.id.btnSoundRecording);
-        mStickerButton = (Button) findViewById(R.id.btnStick);
-        // Initialize progress bar
-        mProgressBar = (ProgressBar) findViewById(R.id.chatMessagesProgressBar);
-        mProgressBar.setVisibility(ProgressBar.INVISIBLE);
 
         // Initialize message ListView and its adapter
         List<Message> messages = new ArrayList<>();
         mMessageAdapter = new ChatMessageListAdapter(this, R.layout.item_chat_message_friend, messages);
         mMessagesListView.setAdapter(mMessageAdapter);
 
-        final String userId = mAuthService.getUserId();
+        if(intent.hasExtra("CHAT_CONTACT")) {
+            final ChatContact chatContact = (ChatContact) intent.getSerializableExtra("CHAT_CONTACT");
+            initChatWithChatContact(chatContact);
+        } else {
+            final String chatId = intent.getStringExtra("CHAT_ID");
+            initChat(chatId);
+        }
 
-        final Query findChatQuery1 = mChatsDatabaseReference.orderByChild(RemoteConfig.CHAT_UNIQUE_MARK).equalTo(userId + "_" + mChatContactFirebaseUserId);
-        final Query findChatQuery2 = mChatsDatabaseReference.orderByChild(RemoteConfig.CHAT_UNIQUE_MARK).equalTo(mChatContactFirebaseUserId + "_" + userId);
-
-        ValueEventListener findChatQuery1ValueEventListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Iterator<DataSnapshot> dataIterator = dataSnapshot.getChildren().iterator();
-                if(dataIterator.hasNext()) {
-                    mChatDatabaseReference = dataIterator.next().getRef();
-                    attachDatabaseReadListenerForMessages();
-                } else {
-                    ValueEventListener findChatQuery2ValueEventListener = new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            Iterator<DataSnapshot> dataIterator = dataSnapshot.getChildren().iterator();
-                            if(dataIterator.hasNext()) {
-                                mChatDatabaseReference = dataIterator.next().getRef();
-                                attachDatabaseReadListenerForMessages();
-                            } else {
-                                String chatKey = mChatsDatabaseReference.push().getKey();
-                                mChatDatabaseReference = mChatsDatabaseReference.child(chatKey);
-                                mChatDatabaseReference.child(RemoteConfig.CHAT_UNIQUE_MARK).setValue(userId + "_" + mChatContactFirebaseUserId);
-
-                                Chat chat = new Chat();
-                                chat.setChatContactId(chatContact.getId());
-                                mLocalDatabaseInstance.addOrUpdateChat(chat);
-
-                                attachDatabaseReadListenerForMessages();
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                        }
-                    };
-                    findChatQuery2.addListenerForSingleValueEvent(findChatQuery2ValueEventListener);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        };
-        findChatQuery1.addListenerForSingleValueEvent(findChatQuery1ValueEventListener);
-
-        mMapButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                locationPlacesIntent();
-            }
-        });
-
-        mStickerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivityForResult(new Intent(getApplicationContext(), StickerActivity.class), RC_STICKER);
-            }
-        });
-
-        mMessageEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                // Enable Send button when there's text to send
-                mSendMessageButton.setEnabled(charSequence.toString().trim().length() > 0);
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
-        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(DEFAULT_MSG_LENGTH_LIMIT)});
-
-        mSendMessageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                String messageContent = mMessageEditText.getText().toString();
-                Message message = new Message(MessageType.TEXT, messageContent, mAuthService.getUserId(), null, new Date());
-
-                String id = mMessagesDatabaseReference.push().getKey();
-                mMessagesDatabaseReference.child(id).setValue(message);
-
-                mMessageEditText.setText("");
-            }
-        });
-
-        mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/jpeg");
-                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-                startActivityForResult(Intent.createChooser(intent, "Complete action using"), RC_PHOTO_PICKER);
-            }
-        });
-
-        mCameraButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dispatchTakeMediaIntent(MediaStore.ACTION_IMAGE_CAPTURE, RC_PHOTO_CAPTURE, "jpg");
-            }
-        });
-
-        mCameraVideoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dispatchTakeMediaIntent(MediaStore.ACTION_VIDEO_CAPTURE, RC_VIDEO_CAPTURE, "mp4");
-            }
-        });
-
-        mSoundRecordingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dispatchTakeMediaIntent(MediaStore.Audio.Media.RECORD_SOUND_ACTION, RC_AUDIO_CAPTURE, "mp3");
-            }
-        });
-
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    onSignedInInitialize(user.getDisplayName());
-                } else {
-                    // User is signed out
-                    onSignedOutCleanup();
-                    finish();
-                    startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-                }
-            }
-        };
+        attachListeners();
 
     }
 
@@ -391,33 +239,6 @@ public class ChatActivity extends AppCompatActivity {
         detachDatabaseReadListenerForMessages();
     }
 
-    private void attachDatabaseReadListenerForMessages() {
-        if(mChatDatabaseReference == null) return;
-        mMessagesDatabaseReference = mChatDatabaseReference.child(RemoteConfig.MESSAGE);
-        if (mChildEventListener == null) {
-            mChildEventListener = new ChildEventListener() {
-                @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    Message message = dataSnapshot.getValue(Message.class);
-                    mMessageAdapter.add(message);
-                }
-
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                }
-
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-                }
-
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                }
-
-                public void onCancelled(DatabaseError databaseError) {
-                }
-            };
-            mMessagesDatabaseReference.addChildEventListener(mChildEventListener);
-        }
-    }
-
     private void detachDatabaseReadListenerForMessages() {
         if (mChildEventListener != null) {
             mMessagesDatabaseReference.removeEventListener(mChildEventListener);
@@ -477,4 +298,213 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    private void bindUIComponents() {
+        // Initialize references to views
+        mMessageEditText = (EditText) findViewById(R.id.chatMessageField);
+        mSendMessageButton = (Button) findViewById(R.id.chatMessageSendBtn);
+        mMessagesListView = (ListView) findViewById(R.id.chatMessagesList);
+        mPhotoPickerButton = (ImageButton) findViewById(R.id.photoPickerButton);
+        mCameraButton = (Button) findViewById(R.id.btnCamera);
+        mCameraVideoButton = (Button) findViewById(R.id.btnCameraVideo);
+        mMapButton = (Button) findViewById(R.id.btnMap);
+        mSoundRecordingButton = (Button) findViewById(R.id.btnSoundRecording);
+        mStickerButton = (Button) findViewById(R.id.btnStick);
+        // Initialize progress bar
+        mProgressBar = (ProgressBar) findViewById(R.id.chatMessagesProgressBar);
+        mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+    }
+
+    private void initServices() {
+        mLocalDatabaseInstance = DatabaseHelper.getInstance(getApplicationContext());
+        mChatsDatabaseReference = MyFirebaseService.getChatsDatabaseReference();
+        mAuthService = new AuthServiceImpl();
+        mFirebaseAuth = MyFirebaseService.getFirebaseAuthInstance();
+        mLocalStorageDir = getExternalFilesDir(Environment.DIRECTORY_DCIM);
+        mFirebaseStorage = MyFirebaseService.getFirebaseStorageInstance();
+    }
+
+    private void initChat(final String chatId) {
+
+        mChatDatabaseReference = mChatsDatabaseReference.child(chatId);
+        attachDatabaseReadListenerForMessages();
+    }
+
+    private void initChatWithChatContact(final ChatContact chatContact) {
+
+        mChatContactFirebaseUserId = chatContact.getFirebaseUserId();
+
+        final String userId = mAuthService.getUserId();
+
+        final Query findChatQuery1 = mChatsDatabaseReference.orderByChild(RemoteConfig.CHAT_UNIQUE_MARK).equalTo(userId + "_" + mChatContactFirebaseUserId);
+        final Query findChatQuery2 = mChatsDatabaseReference.orderByChild(RemoteConfig.CHAT_UNIQUE_MARK).equalTo(mChatContactFirebaseUserId + "_" + userId);
+
+        ValueEventListener findChatQuery1ValueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterator<DataSnapshot> dataIterator = dataSnapshot.getChildren().iterator();
+                if(dataIterator.hasNext()) {
+                    DataSnapshot chatData = dataIterator.next();
+                    mChatDatabaseReference = chatData.getRef();
+                    Chat chat = new Chat();
+                    chat.setChatContactId(chatContact.getId());
+                    chat.setFirebaseId(chatData.getKey());
+                    mLocalDatabaseInstance.addOrUpdateChat(chat);
+                    attachDatabaseReadListenerForMessages();
+                } else {
+                    ValueEventListener findChatQuery2ValueEventListener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Iterator<DataSnapshot> dataIterator = dataSnapshot.getChildren().iterator();
+                            if(dataIterator.hasNext()) {
+                                mChatDatabaseReference = dataIterator.next().getRef();
+                                attachDatabaseReadListenerForMessages();
+                            } else {
+                                String chatKey = mChatsDatabaseReference.push().getKey();
+                                mChatDatabaseReference = mChatsDatabaseReference.child(chatKey);
+                                mChatDatabaseReference.child(RemoteConfig.CHAT_UNIQUE_MARK).setValue(userId + "_" + mChatContactFirebaseUserId);
+
+                                Chat chat = new Chat();
+                                chat.setChatContactId(chatContact.getId());
+                                chat.setFirebaseId(chatKey);
+                                mLocalDatabaseInstance.addOrUpdateChat(chat);
+
+                                attachDatabaseReadListenerForMessages();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    };
+                    findChatQuery2.addListenerForSingleValueEvent(findChatQuery2ValueEventListener);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        };
+        findChatQuery1.addListenerForSingleValueEvent(findChatQuery1ValueEventListener);
+    }
+
+    private void attachDatabaseReadListenerForMessages() {
+        if(mChatDatabaseReference == null) return;
+        mMessagesDatabaseReference = mChatDatabaseReference.child(RemoteConfig.MESSAGE);
+        if (mChildEventListener == null) {
+            mChildEventListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    Message message = dataSnapshot.getValue(Message.class);
+                    mMessageAdapter.add(message);
+                }
+
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                }
+
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                }
+
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                }
+
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            };
+            mMessagesDatabaseReference.addChildEventListener(mChildEventListener);
+        }
+    }
+
+    void attachListeners() {
+        mMapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                locationPlacesIntent();
+            }
+        });
+
+        mStickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivityForResult(new Intent(getApplicationContext(), StickerActivity.class), RC_STICKER);
+            }
+        });
+
+        mMessageEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Enable Send button when there's text to send
+                mSendMessageButton.setEnabled(charSequence.toString().trim().length() > 0);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(DEFAULT_MSG_LENGTH_LIMIT)});
+
+        mSendMessageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String messageContent = mMessageEditText.getText().toString();
+                Message message = new Message(MessageType.TEXT, messageContent, mAuthService.getUserId(), null, new Date());
+
+                String id = mMessagesDatabaseReference.push().getKey();
+                mMessagesDatabaseReference.child(id).setValue(message);
+
+                mMessageEditText.setText("");
+            }
+        });
+
+        mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/jpeg");
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                startActivityForResult(Intent.createChooser(intent, "Complete action using"), RC_PHOTO_PICKER);
+            }
+        });
+
+        mCameraButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dispatchTakeMediaIntent(MediaStore.ACTION_IMAGE_CAPTURE, RC_PHOTO_CAPTURE, "jpg");
+            }
+        });
+
+        mCameraVideoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dispatchTakeMediaIntent(MediaStore.ACTION_VIDEO_CAPTURE, RC_VIDEO_CAPTURE, "mp4");
+            }
+        });
+
+        mSoundRecordingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dispatchTakeMediaIntent(MediaStore.Audio.Media.RECORD_SOUND_ACTION, RC_AUDIO_CAPTURE, "mp3");
+            }
+        });
+
+        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    onSignedInInitialize(user.getDisplayName());
+                } else {
+                    // User is signed out
+                    onSignedOutCleanup();
+                    finish();
+                    startActivity(new Intent(getApplicationContext(), SignupActivity.class));
+                }
+            }
+        };
+    }
 }

@@ -28,7 +28,7 @@ public class ChatContactProfileFragment extends Fragment {
 
     private TextView mNameTextView;
     private TextView mFirebaseNameTextView;
-    private TextView mEmailTextView;
+//    private TextView mEmailTextView;
     private TextView mPhoneNumberTextView;
     private ImageView mProfilePhotoImageView;
 
@@ -51,7 +51,6 @@ public class ChatContactProfileFragment extends Fragment {
 
         mNameTextView = (TextView) view.findViewById(R.id.tvName);
         mFirebaseNameTextView = (TextView) view.findViewById(R.id.tvFirebaseName);
-        mEmailTextView = (TextView) view.findViewById(R.id.tvSignUpEmail);
         mPhoneNumberTextView = (TextView) view.findViewById(R.id.tvPhoneNumber);
         mProfilePhotoImageView = (ImageView) view.findViewById(R.id.imageViewProfile);
 
@@ -59,14 +58,12 @@ public class ChatContactProfileFragment extends Fragment {
 
         mNameTextView.setText(R.string.nameLabel);
         mFirebaseNameTextView.setText(R.string.firebaseNameLabel);
-        mEmailTextView.setText(R.string.emailLabel);
         mPhoneNumberTextView.setText(R.string.phoneNumberLabel);
 
         String name = mChatContact.getName();
         // it is possible that you don't have some chat contact in phone contacts
         mNameTextView.append(name != null ? name : "/");
         mFirebaseNameTextView.append(mChatContact.getFirebaseName());
-        mEmailTextView.append(mChatContact.getEmail());
         mPhoneNumberTextView.append(mChatContact.getPhoneNumber());
 
         mStartChatButton = (Button) view.findViewById(R.id.startChatButton);
