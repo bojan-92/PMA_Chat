@@ -36,7 +36,7 @@ public class ProfileSettingsFragment extends Fragment {
 
     private static int GALLERY_CODE = 1;
 
-    private TextView mLogoutTextView;
+//    private TextView mLogoutTextView;
     private EditText mNameEditText;
     private ImageView mProfilePhotoImageView;
     private Button mSaveButton;
@@ -57,7 +57,7 @@ public class ProfileSettingsFragment extends Fragment {
 
         mUserReference = MyFirebaseService.getCurrentUserDatabaseReference();
 
-        mLogoutTextView = (TextView) view.findViewById(R.id.tvLogout);
+//        mLogoutTextView = (TextView) view.findViewById(R.id.tvLogout);
         mSaveButton = (Button) view.findViewById(R.id.btnSaveProfileSettings);
 
         mNameEditText = (EditText) view.findViewById(R.id.txtProfileSettingsName);
@@ -85,15 +85,15 @@ public class ProfileSettingsFragment extends Fragment {
             }
         });
 
-        mLogoutTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AuthService authService = new AuthServiceImpl();
-                authService.logoutUser();
-                Intent i = new Intent(getActivity().getApplicationContext(), LoginActivity.class);
-                startActivity(i);
-            }
-        });
+//        mLogoutTextView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                AuthService authService = new AuthServiceImpl();
+//                authService.logoutUser();
+//                Intent i = new Intent(getActivity().getApplicationContext(), LoginActivity.class);
+//                startActivity(i);
+//            }
+//        });
 
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override

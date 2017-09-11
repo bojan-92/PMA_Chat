@@ -15,10 +15,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-/**
- * Created by david on 9/11/17.
- */
-
 public class FcmNotificationBuilder {
 
     public static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");

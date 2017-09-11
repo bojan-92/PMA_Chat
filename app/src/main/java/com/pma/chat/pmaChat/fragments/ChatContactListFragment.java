@@ -32,6 +32,7 @@ import com.pma.chat.pmaChat.model.ChatContact;
 import com.pma.chat.pmaChat.model.PhoneContact;
 import com.pma.chat.pmaChat.model.User;
 import com.pma.chat.pmaChat.sync.MyFirebaseService;
+import com.pma.chat.pmaChat.utils.AppUtils;
 import com.pma.chat.pmaChat.utils.Converters;
 
 import java.util.HashMap;
@@ -41,8 +42,6 @@ import java.util.Map;
 
 public class ChatContactListFragment extends Fragment implements
         ChatContactsAdapter.ChatContactsAdapterOnClickHandler  {
-
-    private final int REQUEST_CODE_ASK_PERMISSIONS = 123;
 
    // private static final int ID_CHAT_CONTACTS_LOADER = 11;
 
@@ -75,72 +74,36 @@ public class ChatContactListFragment extends Fragment implements
         mProgressBar = (ProgressBar) view.findViewById(R.id.pb_chat_contacts);
         mProgressBar.setVisibility(ProgressBar.VISIBLE);
 
-       // getActivity().getSupportLoaderManager().initLoader(ID_CHAT_CONTACTS_LOADER, null, this);
-
-        readContactsWrapper();
-
-        DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
-
-        connectedRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                boolean connected = dataSnapshot.getValue(Boolean.class);
-                if (connected) {
-                //    Toast.makeText(getContext(), "Connected", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getContext(), "Not connected", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-
-        mUsersDatabaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                if(mPhoneContacts == null) return;
-
-                updateChatContacts(dataSnapshot);
-
-                loadChatContacts();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-//                Toast.makeText(getContext(), "Server error", Toast.LENGTH_SHORT).show();
-            }
-        });
+        if(AppUtils.isPermissionGrunted(this.getActivity(), android.Manifest.permission.READ_CONTACTS)) {
+            readContacts();
+        } else {
+            AppUtils.gruntPermission(this.getActivity(), android.Manifest.permission.READ_CONTACTS, "You need to allow access to Contacts");
+        }
 
         return view;
 
     }
 
-    private void readContactsWrapper() {
-        int hasReadContactsPermission = ContextCompat.checkSelfPermission(getActivity(),
-                android.Manifest.permission.READ_CONTACTS);
-        if (hasReadContactsPermission != PackageManager.PERMISSION_GRANTED) {
-            if (!ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-                    android.Manifest.permission.READ_CONTACTS)) {
-                showMessageOKCancel("You need to allow access to Contacts",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                ActivityCompat.requestPermissions(getActivity(),
-                                        new String[] {android.Manifest.permission.READ_CONTACTS},
-                                        REQUEST_CODE_ASK_PERMISSIONS);
-                            }
-                        });
-                return;
-            }
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[] {android.Manifest.permission.READ_CONTACTS},
-                    REQUEST_CODE_ASK_PERMISSIONS);
-            return;
-        }
-        readContacts();
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
+
+        connectedRef.addValueEventListener(connectedListener);
+
+        mUsersDatabaseReference.addValueEventListener(usersValueEventListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
+
+        connectedRef.removeEventListener(connectedListener);
+
+        mUsersDatabaseReference.removeEventListener(usersValueEventListener);
     }
 
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
@@ -155,7 +118,7 @@ public class ChatContactListFragment extends Fragment implements
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
-            case REQUEST_CODE_ASK_PERMISSIONS:
+            case AppUtils.REQUEST_CODE_ASK_PERMISSIONS:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission Granted
                     readContacts();
@@ -261,5 +224,38 @@ public class ChatContactListFragment extends Fragment implements
         mProgressBar.setVisibility(View.INVISIBLE);
         /* Finally, make sure the weather data is visible */
         mRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private ValueEventListener connectedListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            boolean connected = dataSnapshot.getValue(Boolean.class);
+            if (connected) {
+                //    Toast.makeText(getContext(), "Connected", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Not connected", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+        }
+    };
+
+    private ValueEventListener usersValueEventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+
+            if(mPhoneContacts == null) return;
+
+            updateChatContacts(dataSnapshot);
+
+            loadChatContacts();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+//                Toast.makeText(getContext(), "Server error", Toast.LENGTH_SHORT).show();
+        }
     }
 }

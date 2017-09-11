@@ -42,7 +42,7 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ChatsAdapter
     public ChatsAdapter(Context context, ChatsAdapterOnClickHandler clickHandler) {
         mContext = context;
         mClickHandler = clickHandler;
-        mLocalDatabaseInstance = DatabaseHelper.getInstance(context);
+        mLocalDatabaseInstance = DatabaseHelper.getInstance(context.getApplicationContext());
     }
 
     @Override

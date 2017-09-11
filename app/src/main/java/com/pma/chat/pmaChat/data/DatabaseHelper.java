@@ -50,7 +50,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         ChatContactEntry._ID            + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         ChatContactEntry.COLUMN_NAME    + " TEXT NOT NULL, " +
                         ChatContactEntry.COLUMN_FIREBASE_NAME    + " TEXT NOT NULL, " +
-                        ChatContactEntry.COLUMN_EMAIL   + " TEXT NOT NULL, " +
                         ChatContactEntry.COLUMN_NUMBER  + " TEXT NOT NULL, " +
                         ChatContactEntry.COLUMN_FIREBASE_USER_ID  + " TEXT NOT NULL )";
 
@@ -58,6 +57,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "CREATE TABLE " + ChatEntry.TABLE_NAME + " (" +
                         ChatEntry._ID                       + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         ChatEntry.COLUMN_CHAT_CONTACT_ID    + " INTEGER NOT NULL, " +
+                        ChatEntry.COLUMN_FIREBASE_ID    + " TEXT NOT NULL, " +
                         "FOREIGN KEY (" + (ChatEntry.COLUMN_CHAT_CONTACT_ID) + ") REFERENCES " + ChatContactEntry.TABLE_NAME + "(" + ChatContactEntry._ID + ") " + " )";
 
 //        final String SQL_CREATE_MESSAGE_TABLE =
@@ -96,7 +96,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(ChatContactEntry.COLUMN_NAME, chatContact.getName());
             values.put(ChatContactEntry.COLUMN_FIREBASE_NAME, chatContact.getFirebaseName());
-            values.put(ChatContactEntry.COLUMN_EMAIL, chatContact.getEmail());
             values.put(ChatContactEntry.COLUMN_NUMBER, chatContact.getPhoneNumber());
             values.put(ChatContactEntry.COLUMN_FIREBASE_USER_ID, chatContact.getFirebaseUserId());
 
@@ -206,6 +205,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             ContentValues values = new ContentValues();
             values.put(ChatEntry.COLUMN_CHAT_CONTACT_ID, chat.getChatContactId());
+            values.put(ChatEntry.COLUMN_FIREBASE_ID, chat.getFirebaseId());
 
             // First try to update the user in case the user already exists in the database
             // This assumes phoneNumber are unique
@@ -249,6 +249,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(SELECT_QUERY, null);
 
         return cursor;
+    }
+
+    public Chat getChatByFirebaseId(String chatFirebaseId) {
+
+        String SELECT_QUERY =
+                String.format("SELECT * FROM %s WHERE %s = ?",
+                        ChatEntry.TABLE_NAME, ChatEntry.COLUMN_FIREBASE_ID);
+
+        // "getReadableDatabase()" and "getWriteableDatabase()" return the same object (except under low disk space scenarios)
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery(SELECT_QUERY, new String[]{chatFirebaseId});
+
+        try {
+            if (cursor.moveToFirst()) {
+                Chat chat = Helpers.getChatFromCursor(cursor);
+                return chat;
+            }
+        } catch (Exception e) {
+            //Log.d(TAG, "Error while trying to get posts from database");
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+
+        return null;
     }
 
 }

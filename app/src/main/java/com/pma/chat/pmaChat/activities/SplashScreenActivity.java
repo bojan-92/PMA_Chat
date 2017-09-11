@@ -46,7 +46,7 @@ public class SplashScreenActivity extends Activity {
                     }
                 }
                 if (progressStatus == 100) {
-                    Intent i = new Intent(SplashScreenActivity.this, LoginActivity.class);
+                    Intent i = new Intent(SplashScreenActivity.this, MainActivity.class);
                     startActivity(i);
                 }
             }

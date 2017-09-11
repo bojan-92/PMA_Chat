@@ -5,9 +5,6 @@ import android.content.SharedPreferences;
 
 import java.util.Set;
 
-/**
- * Created by david on 9/11/17.
- */
 public class SharedPrefUtil {
     /**
      * Name of the preference file

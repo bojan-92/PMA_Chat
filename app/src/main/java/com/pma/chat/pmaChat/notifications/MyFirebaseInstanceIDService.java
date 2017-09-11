@@ -9,7 +9,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 import com.pma.chat.pmaChat.model.User;
-import com.pma.chat.pmaChat.services.UserService;
+import com.pma.chat.pmaChat.services.UserServiceImpl;
 import com.pma.chat.pmaChat.utils.SharedPrefUtil;
 import com.pma.chat.pmaChat.R;
 
@@ -38,7 +38,7 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
         new SharedPrefUtil(getApplicationContext()).saveString(User.USER_FCM_TOKEN_FIELD, token);
 
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            new UserService().setFcmToken(token);
+            new UserServiceImpl().setFcmToken(token);
         }
     }
 }

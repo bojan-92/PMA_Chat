@@ -13,7 +13,7 @@ public class ChatContact implements Serializable {
     // name from firebase
     private String firebaseName;
 
-    private String email;
+//    private String email;
 
     private String phoneNumber;
 
@@ -22,11 +22,10 @@ public class ChatContact implements Serializable {
     public ChatContact() {
     }
 
-    public ChatContact(Long id, String name, String firebaseName, String email, String phoneNumber, String firebaseUserId) {
+    public ChatContact(Long id, String name, String firebaseName, String phoneNumber, String firebaseUserId) {
         this.id = id;
         this.name = name;
         this.firebaseName = firebaseName;
-        this.email = email;
         this.phoneNumber = phoneNumber;
         this.firebaseUserId = firebaseUserId;
     }
@@ -55,14 +54,6 @@ public class ChatContact implements Serializable {
         this.firebaseName = firebaseName;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -84,7 +75,6 @@ public class ChatContact implements Serializable {
         return "ChatContact{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", firebaseUserId='" + firebaseUserId + '\'' +
                 '}';

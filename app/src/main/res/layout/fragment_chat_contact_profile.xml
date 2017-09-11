@@ -46,24 +46,13 @@
         android:padding="5dp"
         android:textAlignment="center" />
 
-    <TextView
-        android:id="@+id/tvSignUpEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/tvFirebaseName"
-        android:layout_marginTop="14dp"
-        android:ems="10"
-        android:hint="@string/loginEmail"
-        android:padding="5dp"
-        android:textAlignment="center"/>
 
     <TextView
         android:id="@+id/tvPhoneNumber"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/tvSignUpEmail"
+        android:layout_below="@+id/tvFirebaseName"
         android:layout_marginTop="12dp"
         android:ems="10"
         android:padding="5dp"

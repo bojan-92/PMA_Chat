@@ -7,7 +7,7 @@ public class User {
 
     private String name;
 
-    private String email;
+//    private String email;
 
     private String phoneNumber;
 
@@ -20,9 +20,8 @@ public class User {
     public User() {
     }
 
-    public User(String name, String email, String phoneNumber, String profileImageUri) {
+    public User(String name, String phoneNumber, String profileImageUri) {
         this.name = name;
-        this.email = email;
         this.phoneNumber = phoneNumber;
         this.profileImageUri = profileImageUri;
     }
@@ -33,14 +32,6 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getPhoneNumber() {

@@ -1,8 +1,5 @@
 package com.pma.chat.pmaChat.utils;
 
-/**
- * Created by david on 9/11/17.
- */
 
 public class Constants {
 
