@@ -156,8 +156,10 @@ public class ChatContactListFragment extends Fragment implements
         Map<String, String> phoneNumbersWithNames = new HashMap<>();
 
         for(PhoneContact phoneContact : mPhoneContacts) {
-            String phoneNumber = phoneContact.getPhoneNumber().replace("(", "").replace(")", "").replace("-", "").replace(" ", "");
-            phoneNumbersWithNames.put(phoneNumber, phoneContact.getDisplayName());
+            if(phoneContact.getPhoneNumber() != null) {
+                String phoneNumber = phoneContact.getPhoneNumber().replace("(", "").replace(")", "").replace("-", "").replace(" ", "");
+                phoneNumbersWithNames.put(phoneNumber, phoneContact.getDisplayName());
+            }
         }
 
         for (DataSnapshot data : dataSnapshot.getChildren()) {
