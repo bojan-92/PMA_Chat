@@ -257,5 +257,5 @@ public class ChatContactListFragment extends Fragment implements
         public void onCancelled(DatabaseError databaseError) {
 //                Toast.makeText(getContext(), "Server error", Toast.LENGTH_SHORT).show();
         }
-    }
+    };
 }

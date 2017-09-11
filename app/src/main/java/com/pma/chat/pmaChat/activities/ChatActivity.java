@@ -55,6 +55,7 @@ import com.pma.chat.pmaChat.model.User;
 import com.pma.chat.pmaChat.notifications.FcmNotificationBuilder;
 import com.pma.chat.pmaChat.services.UserCallback;
 import com.pma.chat.pmaChat.services.UserService;
+import com.pma.chat.pmaChat.services.UserServiceImpl;
 import com.pma.chat.pmaChat.sync.MyFirebaseService;
 import com.pma.chat.pmaChat.utils.AppUtils;
 import com.pma.chat.pmaChat.utils.FileUtils;
@@ -435,7 +436,7 @@ public class ChatActivity extends AppCompatActivity {
         mLocalDatabaseInstance = DatabaseHelper.getInstance(getApplicationContext());
         mChatsDatabaseReference = MyFirebaseService.getChatsDatabaseReference();
         mAuthService = new AuthServiceImpl();
-        mUserService = new UserService();
+        mUserService = new UserServiceImpl();
         mFirebaseAuth = MyFirebaseService.getFirebaseAuthInstance();
         mLocalStorageDir = getExternalFilesDir(Environment.DIRECTORY_DCIM);
         mFirebaseStorage = MyFirebaseService.getFirebaseStorageInstance();
