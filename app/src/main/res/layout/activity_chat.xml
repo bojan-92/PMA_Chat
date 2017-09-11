@@ -5,11 +5,20 @@
     android:orientation="vertical"
     android:background="@color/colorLight">
 
-    <ListView
-        android:id="@+id/chatMessagesList"
+    <!--<ListView-->
+        <!--android:id="@+id/chatMessagesList"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_above="@+id/chatMessagesTextMessageContainer" />-->
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_messages"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/chatMessagesTextMessageContainer" />
+        android:layout_above="@+id/chatMessagesTextMessageContainer"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"/>
+
 
     <LinearLayout
         android:id="@+id/chatMessagesTextMessageContainer"
@@ -40,14 +49,14 @@
             android:text="@string/chatMessageSendText"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <Button
-            android:id="@+id/locationSendBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|center_horizontal"
-            android:gravity="center"
-            android:text="@string/location"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <!--<Button-->
+            <!--android:id="@+id/locationSendBtn"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center_vertical|center_horizontal"-->
+            <!--android:gravity="center"-->
+            <!--android:text="@string/location"-->
+            <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
 
     </LinearLayout>
 
@@ -109,12 +118,5 @@
             />
 
     </LinearLayout>
-
-    <ProgressBar
-        android:id="@+id/chatMessagesProgressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true" />
 
 </RelativeLayout>

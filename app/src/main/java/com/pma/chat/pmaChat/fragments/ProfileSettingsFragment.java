@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -25,9 +24,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.pma.chat.pmaChat.R;
-import com.pma.chat.pmaChat.auth.AuthService;
-import com.pma.chat.pmaChat.auth.AuthServiceImpl;
-import com.pma.chat.pmaChat.auth.LoginActivity;
 import com.pma.chat.pmaChat.model.User;
 import com.pma.chat.pmaChat.sync.MyFirebaseService;
 
@@ -57,7 +53,6 @@ public class ProfileSettingsFragment extends Fragment {
 
         mUserReference = MyFirebaseService.getCurrentUserDatabaseReference();
 
-//        mLogoutTextView = (TextView) view.findViewById(R.id.tvLogout);
         mSaveButton = (Button) view.findViewById(R.id.btnSaveProfileSettings);
 
         mNameEditText = (EditText) view.findViewById(R.id.txtProfileSettingsName);
@@ -84,16 +79,6 @@ public class ProfileSettingsFragment extends Fragment {
 
             }
         });
-
-//        mLogoutTextView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                AuthService authService = new AuthServiceImpl();
-//                authService.logoutUser();
-//                Intent i = new Intent(getActivity().getApplicationContext(), LoginActivity.class);
-//                startActivity(i);
-//            }
-//        });
 
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -7,6 +7,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.pma.chat.pmaChat.model.User;
 import com.pma.chat.pmaChat.sync.MyFirebaseService;
+import com.pma.chat.pmaChat.utils.RemoteConfig;
 
 public class UserServiceImpl implements UserService {
     @Override
@@ -14,7 +15,7 @@ public class UserServiceImpl implements UserService {
         {
             FirebaseDatabase.getInstance()
                     .getReference()
-                    .child("user")
+                    .child(RemoteConfig.USER)
                     .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                     .child(User.USER_FCM_TOKEN_FIELD)
                     .setValue(token);
@@ -22,7 +23,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void getUser(final String uid,final UserCallback callback) {
+    public void getUser(final String uid, final UserCallback callback) {
         MyFirebaseService.getUsersDatabaseReference().child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

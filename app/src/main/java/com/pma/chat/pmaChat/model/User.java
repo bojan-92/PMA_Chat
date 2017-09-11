@@ -5,15 +5,14 @@ import java.util.Calendar;
 
 public class User {
 
-    private String name;
+    public static final String USER_FCM_TOKEN_FIELD = "fcmtoken";
 
-//    private String email;
+    private String name;
 
     private String phoneNumber;
 
     private String profileImageUri;
 
-    public static final String USER_FCM_TOKEN_FIELD = "fcmtoken";
     private String fcmToken;
 
 
@@ -49,7 +48,6 @@ public class User {
     public void setProfileImageUri(String profileImageUri) {
         this.profileImageUri = profileImageUri;
     }
-
 
     public String getFcmToken() {
         return fcmToken;

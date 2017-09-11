@@ -55,7 +55,7 @@ public class AppUtils {
         return hasReadContactsPermission == PackageManager.PERMISSION_GRANTED;
     }
 
-    public static void gruntPermission(final Activity activity, final String permission, String message) {
+    public static void gruntPermission(final Activity activity, final String permission, String message, final int rcCode) {
         int hasReadContactsPermission = ContextCompat.checkSelfPermission(activity,
                 permission);
         if (hasReadContactsPermission != PackageManager.PERMISSION_GRANTED) {
@@ -66,20 +66,20 @@ public class AppUtils {
                             public void onClick(DialogInterface dialog, int which) {
                                 ActivityCompat.requestPermissions(activity,
                                         new String[]{permission},
-                                        REQUEST_CODE_ASK_PERMISSIONS);
-                                dialog.dismiss();
+                                        rcCode);
+//                                dialog.dismiss();
                             }
                         },
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
+//                                dialog.dismiss();
                             }
                         });
             }
             ActivityCompat.requestPermissions(activity,
                     new String[]{permission},
-                    REQUEST_CODE_ASK_PERMISSIONS);
+                    rcCode);
         }
     }
 

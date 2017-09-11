@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -113,6 +114,9 @@ public class MainActivity extends AppCompatActivity implements ConnectionService
         if(mAuthService.getUser() != null) {
 
             mDrawerListView.setOnItemClickListener(navigationDrawerOnItemClickListener);
+
+            mUserReference = MyFirebaseService.getCurrentUserDatabaseReference();
+            mUserReference.addValueEventListener(userInfoValueEventListener);
         }
 
     }
@@ -121,8 +125,8 @@ public class MainActivity extends AppCompatActivity implements ConnectionService
     public void onProcessFinish(Boolean hasInternetConnection) {
         // if there is internet connection refresh data and load user profile image
         if(hasInternetConnection && mAuthService.getUser() != null) {
-            mUserReference = MyFirebaseService.getCurrentUserDatabaseReference();
-            mUserReference.addValueEventListener(userInfoValueEventListener);
+//            mUserReference = MyFirebaseService.getCurrentUserDatabaseReference();
+//            mUserReference.addValueEventListener(userInfoValueEventListener);
         }
     }
 
@@ -167,6 +171,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionService
             if (userInfo.getProfileImageUri() != null) {
                 Glide.with(mDrawerHeaderAvatar.getContext())
                         .load(userInfo.getProfileImageUri())
+                        .apply(RequestOptions.circleCropTransform())
                         .into(mDrawerHeaderAvatar);
             }
         }
@@ -228,8 +233,6 @@ public class MainActivity extends AppCompatActivity implements ConnectionService
             SharedPreferences.Editor editor = pref.edit();
             editor.putString("phoneNumber", firebaseUser.getPhoneNumber());
 
-            new UserServiceImpl().setFcmToken(new SharedPrefUtil(getApplicationContext()).getString((User.USER_FCM_TOKEN_FIELD)));
-
             String userId = firebaseUser.getUid();
             DatabaseReference currentUserRef = MyFirebaseService.getUsersDatabaseReference().child(userId);
 
@@ -238,6 +241,8 @@ public class MainActivity extends AppCompatActivity implements ConnectionService
             currentUserRef.setValue(user, new DatabaseReference.CompletionListener() {
                 @Override
                 public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    String userFcmToken = new SharedPrefUtil(getApplicationContext()).getString((User.USER_FCM_TOKEN_FIELD));
+                    new UserServiceImpl().setFcmToken(userFcmToken);
                 }
             });
         }

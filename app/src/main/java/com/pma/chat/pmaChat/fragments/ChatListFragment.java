@@ -79,6 +79,39 @@ public class ChatListFragment extends Fragment implements
         mChatsDatabaseReference.removeEventListener(chatsValueEventListener);
     }
 
+    @Override
+    public void onClick(Chat chat) {
+        //ChatContact chatContact = mLocalDatabaseInstance.getChatContactById(chat.getChatContactId());
+        Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+        //chatIntent.putExtra("CHAT_CONTACT", chatContact);
+        chatIntent.putExtra("CHAT_ID", chat.getFirebaseId());
+        startActivity(chatIntent);
+    }
+
+    private void showChatsView() {
+        /* First, hide the loading indicator */
+        mProgressBar.setVisibility(View.INVISIBLE);
+        /* Finally, make sure the weather data is visible */
+        mRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private ValueEventListener chatsValueEventListener = new ValueEventListener() {
+
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+
+            updateChats(dataSnapshot);
+
+            loadChats();
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+            // if there is no internet, just load chats from local database
+            //         loadChats();
+        }
+    };
+
     private void updateChats(DataSnapshot dataSnapshot) {
 
         final String currentUserId = mAuthService.getUserId();
@@ -113,6 +146,7 @@ public class ChatListFragment extends Fragment implements
                 } else {
                     Chat chat = new Chat();
                     chat.setChatContactId(chatContact.getId());
+                    chat.setFirebaseId(chatId);
                     mLocalDatabaseInstance.addOrUpdateChat(chat);
                 }
             }
@@ -143,39 +177,6 @@ public class ChatListFragment extends Fragment implements
             mProgressBar.setVisibility(View.INVISIBLE);
         }
     }
-
-    @Override
-    public void onClick(Chat chat) {
-        //ChatContact chatContact = mLocalDatabaseInstance.getChatContactById(chat.getChatContactId());
-        Intent chatIntent = new Intent(getContext(), ChatActivity.class);
-        //chatIntent.putExtra("CHAT_CONTACT", chatContact);
-        chatIntent.putExtra("CHAT_ID", chat.getFirebaseId());
-        startActivity(chatIntent);
-    }
-
-    private void showChatsView() {
-        /* First, hide the loading indicator */
-        mProgressBar.setVisibility(View.INVISIBLE);
-        /* Finally, make sure the weather data is visible */
-        mRecyclerView.setVisibility(View.VISIBLE);
-    }
-
-    private ValueEventListener chatsValueEventListener = new ValueEventListener() {
-
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-
-            updateChats(dataSnapshot);
-
-            loadChats();
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-            // if there is no internet, just load chats from local database
-            //         loadChats();
-        }
-    };
 }
 
 

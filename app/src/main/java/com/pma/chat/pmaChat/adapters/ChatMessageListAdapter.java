@@ -170,24 +170,7 @@ public class ChatMessageListAdapter extends ArrayAdapter<Message> {
 
         }
 
-        mUserReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                User userInfo = dataSnapshot.getValue(User.class);
-
-                if(userInfo.getProfileImageUri() != null) {
-                    Glide.with(mProfilePhotoImageView.getContext())
-                            .load(userInfo.getProfileImageUri())
-                            .into(mProfilePhotoImageView);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
 
         return convertView;

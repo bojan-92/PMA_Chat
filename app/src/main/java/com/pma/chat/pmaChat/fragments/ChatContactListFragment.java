@@ -77,7 +77,7 @@ public class ChatContactListFragment extends Fragment implements
         if(AppUtils.isPermissionGrunted(this.getActivity(), android.Manifest.permission.READ_CONTACTS)) {
             readContacts();
         } else {
-            AppUtils.gruntPermission(this.getActivity(), android.Manifest.permission.READ_CONTACTS, "You need to allow access to Contacts");
+            AppUtils.gruntPermission(this.getActivity(), android.Manifest.permission.READ_CONTACTS, "You need to allow access to Contacts", 50);
         }
 
         return view;
@@ -118,7 +118,7 @@ public class ChatContactListFragment extends Fragment implements
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
-            case AppUtils.REQUEST_CODE_ASK_PERMISSIONS:
+            case 50:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission Granted
                     readContacts();

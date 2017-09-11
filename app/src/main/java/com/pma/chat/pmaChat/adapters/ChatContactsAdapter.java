@@ -2,6 +2,7 @@ package com.pma.chat.pmaChat.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -135,6 +137,7 @@ public class ChatContactsAdapter extends RecyclerView.Adapter<ChatContactsAdapte
 
         final ImageView profilePhotoImageView;
         final TextView nameTextView;
+        final TextView firebaseNameTextView;
         final TextView statusTextView;
 
         ChatContactsAdapterViewHolder(View itemView) {
@@ -142,6 +145,7 @@ public class ChatContactsAdapter extends RecyclerView.Adapter<ChatContactsAdapte
 
             profilePhotoImageView = (ImageView) itemView.findViewById(R.id.iv_profile_photo);
             nameTextView = (TextView) itemView.findViewById(R.id.tv_name);
+            firebaseNameTextView = (TextView) itemView.findViewById(R.id.tv_firebase_name);
             statusTextView = (TextView) itemView.findViewById(R.id.tv_status);
 
             itemView.setOnClickListener(this);
@@ -149,7 +153,7 @@ public class ChatContactsAdapter extends RecyclerView.Adapter<ChatContactsAdapte
 
         void bind(ChatContact chatContact) {
             nameTextView.setText(chatContact.getName());
-            //statusTextView.setText("Offline");
+            firebaseNameTextView.setText("(" + chatContact.getFirebaseName() + ")");
             DatabaseReference chatContactRef = MyFirebaseService.getUserDatabaseReferenceById(chatContact.getFirebaseUserId());
             chatContactRef.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -157,9 +161,20 @@ public class ChatContactsAdapter extends RecyclerView.Adapter<ChatContactsAdapte
 
                     User userInfo = dataSnapshot.getValue(User.class);
 
-                    if(userInfo != null && userInfo.getProfileImageUri() != null) {
+                    if(userInfo == null) return;
+
+                    if(userInfo.getFcmToken() != null) {
+                        statusTextView.setText("Online");
+                        statusTextView.setTextColor(Color.parseColor("#009933"));
+                    } else {
+                        statusTextView.setText("Offline");
+                        statusTextView.setTextColor(Color.parseColor("#808080"));
+                    }
+
+                    if(userInfo.getProfileImageUri() != null) {
                         Glide.with(profilePhotoImageView.getContext())
                                 .load(userInfo.getProfileImageUri())
+                                .apply(RequestOptions.circleCropTransform())
                                 .into(profilePhotoImageView);
                     }
 
