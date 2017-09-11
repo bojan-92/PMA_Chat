@@ -49,6 +49,7 @@ dependencies {
     // https://mvnrepository.com/artifact/com.j256.ormlite/ormlite-android
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:multidex:1.0.1'
+    compile 'com.google.android.gms:play-services-location:10.2.6'
 
     debugCompile 'com.amitshekhar.android:debug-db:1.0.0'
 
