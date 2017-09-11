@@ -59,5 +59,7 @@
     <string name="noInternetConnection">No internet connection</string>
     <string name="chatsTitle">Chats</string>
     <string name="chatContactsTitle">Contacts</string>
+    <string name="googleApiKey">AIzaSyA-S6yoLjipkHSdEWzPIKvMQTCU5heFVEA</string>
+    <string name="location">Location</string>
 
 </resources>

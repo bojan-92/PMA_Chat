@@ -1,13 +1,18 @@
 package com.pma.chat.pmaChat.activities;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -26,6 +31,8 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -76,6 +83,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private EditText mMessageEditText;
     private Button mSendMessageButton;
+    private Button mSendLocationButton;
     private ListView mMessagesListView;
     private Button mCameraButton;
     private Button mMapButton;
@@ -124,6 +132,8 @@ public class ChatActivity extends AppCompatActivity {
 
     private static final int RC_STICKER = 6;
 
+    private static final int LOCATION = 7;
+
     private File mLocalStorageDir;
 
     private User currentUser;
@@ -156,6 +166,7 @@ public class ChatActivity extends AppCompatActivity {
         // Initialize references to views
         mMessageEditText = (EditText) findViewById(R.id.chatMessageField);
         mSendMessageButton = (Button) findViewById(R.id.chatMessageSendBtn);
+        mSendLocationButton = (Button) findViewById(R.id.locationSendBtn);
         mMessagesListView = (ListView) findViewById(R.id.chatMessagesList);
         mPhotoPickerButton = (ImageButton) findViewById(R.id.photoPickerButton);
         mCameraButton = (Button) findViewById(R.id.btnCamera);
@@ -206,7 +217,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Iterator<DataSnapshot> dataIterator = dataSnapshot.getChildren().iterator();
-                if(dataIterator.hasNext()) {
+                if (dataIterator.hasNext()) {
                     mChatDatabaseReference = dataIterator.next().getRef();
                     attachDatabaseReadListenerForMessages();
                 } else {
@@ -214,7 +225,7 @@ public class ChatActivity extends AppCompatActivity {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             Iterator<DataSnapshot> dataIterator = dataSnapshot.getChildren().iterator();
-                            if(dataIterator.hasNext()) {
+                            if (dataIterator.hasNext()) {
                                 mChatDatabaseReference = dataIterator.next().getRef();
                                 attachDatabaseReadListenerForMessages();
                             } else {
@@ -395,6 +406,22 @@ public class ChatActivity extends AppCompatActivity {
                 MapModel mapModel = new MapModel(latLng.latitude + "", latLng.longitude + "");
             }
         }
+
+        if (requestCode == LOCATION) {
+            mSendLocationButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    LocationManager mlocManager = null;
+
+                    Location lastLocation = mlocManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                    String key = mChatsDatabaseReference.push().getKey();
+                    Message message = new Message(MessageType.LOCATION, key, mAuthService.getUserId(), null, new Date());
+
+                    String id = mMessagesDatabaseReference.push().getKey();
+                    mMessagesDatabaseReference.child(id).setValue(message);
+                }
+            });
+        }
     }
 
     public Uri getImageUri(Context inContext, Bitmap inImage) {
@@ -502,6 +529,7 @@ public class ChatActivity extends AppCompatActivity {
             case RC_PHOTO_CAPTURE : return RemoteConfig.PHOTO_STORAGE;
             case RC_VIDEO_CAPTURE : return RemoteConfig.VIDEO_STORAGE;
             case RC_AUDIO_CAPTURE : return RemoteConfig.AUDIO_STORAGE;
+            case LOCATION : return RemoteConfig.LOCATION;
             default: return "";
         }
     }
@@ -511,6 +539,7 @@ public class ChatActivity extends AppCompatActivity {
             case RC_PHOTO_CAPTURE : return MessageType.PHOTO;
             case RC_VIDEO_CAPTURE : return MessageType.VIDEO;
             case RC_AUDIO_CAPTURE : return MessageType.SOUND;
+            case LOCATION : return MessageType.LOCATION;
             default: return MessageType.TEXT;
         }
     }
