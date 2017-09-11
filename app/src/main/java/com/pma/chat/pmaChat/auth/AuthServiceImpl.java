@@ -11,18 +11,23 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.pma.chat.pmaChat.model.User;
+import com.pma.chat.pmaChat.services.IUserService;
+import com.pma.chat.pmaChat.services.UserService;
 import com.pma.chat.pmaChat.utils.RemoteConfig;
+import com.pma.chat.pmaChat.utils.SharedPrefUtil;
 
 public class AuthServiceImpl implements AuthService {
 
     private FirebaseAuth mFirebaseAuth;
 
     private DatabaseReference mFirebaseRootDatabaseRef;
+    private IUserService userService;
 
 
     public AuthServiceImpl() {
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseRootDatabaseRef = FirebaseDatabase.getInstance().getReference();
+        userService = new UserService();
     }
 
     @Override
@@ -84,6 +89,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void logoutUser() {
+        userService.setFcmToken(null);
         mFirebaseAuth.signOut();
     }
 }

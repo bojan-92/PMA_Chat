@@ -13,6 +13,9 @@ import android.widget.Toast;
 
 import com.pma.chat.pmaChat.activities.MainActivity;
 import com.pma.chat.pmaChat.R;
+import com.pma.chat.pmaChat.model.User;
+import com.pma.chat.pmaChat.services.UserService;
+import com.pma.chat.pmaChat.utils.SharedPrefUtil;
 
 
 public class LoginActivity extends Activity {
@@ -86,6 +89,7 @@ public class LoginActivity extends Activity {
             public void notifyUI(boolean result) {
                 progressDialog.dismiss();
                 if(result) {
+                    new UserService().setFcmToken(new SharedPrefUtil(getApplicationContext()).getString((User.USER_FCM_TOKEN_FIELD)));
                     finish();
                     startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 } else {

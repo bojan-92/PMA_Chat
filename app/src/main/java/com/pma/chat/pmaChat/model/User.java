@@ -13,6 +13,10 @@ public class User {
 
     private String profileImageUri;
 
+    public static final String USER_FCM_TOKEN_FIELD = "fcmtoken";
+    private String fcmToken;
+
+
     public User() {
     }
 
@@ -53,5 +57,14 @@ public class User {
 
     public void setProfileImageUri(String profileImageUri) {
         this.profileImageUri = profileImageUri;
+    }
+
+
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 }

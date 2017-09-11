@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -21,25 +20,24 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.pma.chat.pmaChat.R;
 import com.pma.chat.pmaChat.adapters.DrawerListAdapter;
-import com.pma.chat.pmaChat.adapters.StickerAdapter;
 import com.pma.chat.pmaChat.auth.AuthService;
 import com.pma.chat.pmaChat.auth.AuthServiceImpl;
 import com.pma.chat.pmaChat.auth.LoginActivity;
 import com.pma.chat.pmaChat.fragments.ChatListFragment;
+import com.pma.chat.pmaChat.model.Message;
 import com.pma.chat.pmaChat.model.NavItem;
 import com.pma.chat.pmaChat.data.DatabaseHelper;
 import com.pma.chat.pmaChat.fragments.ChatContactListFragment;
-import com.pma.chat.pmaChat.fragments.ChatContactProfileFragment;
 import com.pma.chat.pmaChat.fragments.ProfileSettingsFragment;
 import com.pma.chat.pmaChat.model.User;
+import com.pma.chat.pmaChat.notifications.FcmNotificationBuilder;
+import com.pma.chat.pmaChat.services.IUserService;
+import com.pma.chat.pmaChat.services.UserService;
 import com.pma.chat.pmaChat.sync.MyFirebaseService;
-import com.pma.chat.pmaChat.utils.RemoteConfig;
+import com.pma.chat.pmaChat.utils.SharedPrefUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +64,6 @@ public class MainActivity extends AppCompatActivity  {
 
     private AuthService mAuthService;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -74,6 +71,7 @@ public class MainActivity extends AppCompatActivity  {
         setContentView(R.layout.activity_main);
 
         mAuthService = new AuthServiceImpl();
+
 
         if(mAuthService.getUser() == null){
             finish();

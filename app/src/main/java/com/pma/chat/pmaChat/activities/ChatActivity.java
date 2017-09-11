@@ -51,6 +51,11 @@ import com.pma.chat.pmaChat.model.ChatContact;
 import com.pma.chat.pmaChat.model.MapModel;
 import com.pma.chat.pmaChat.model.Message;
 import com.pma.chat.pmaChat.model.MessageType;
+import com.pma.chat.pmaChat.model.User;
+import com.pma.chat.pmaChat.notifications.FcmNotificationBuilder;
+import com.pma.chat.pmaChat.services.IUserService;
+import com.pma.chat.pmaChat.services.UserCallback;
+import com.pma.chat.pmaChat.services.UserService;
 import com.pma.chat.pmaChat.sync.MyFirebaseService;
 import com.pma.chat.pmaChat.utils.AppUtils;
 import com.pma.chat.pmaChat.utils.FileUtils;
@@ -87,6 +92,7 @@ public class ChatActivity extends AppCompatActivity {
     private ChatMessageListAdapter mMessageAdapter;
 
     private AuthService mAuthService;
+    private IUserService mUserService;
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseStorage mFirebaseStorage;
@@ -120,6 +126,10 @@ public class ChatActivity extends AppCompatActivity {
 
     private File mLocalStorageDir;
 
+    private User currentUser;
+    private User otherUser;
+    private ChatContact chatContact;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,7 +138,7 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         Intent intent = getIntent();
-        final ChatContact chatContact = (ChatContact) intent.getSerializableExtra("CHAT_CONTACT");
+        chatContact = (ChatContact) intent.getSerializableExtra("CHAT_CONTACT");
 
         mChatContactFirebaseUserId = chatContact.getFirebaseUserId();
 
@@ -137,6 +147,7 @@ public class ChatActivity extends AppCompatActivity {
         mChatsDatabaseReference = MyFirebaseService.getChatsDatabaseReference();
 
         mAuthService = new AuthServiceImpl();
+        mUserService = new UserService();
         mFirebaseAuth = MyFirebaseService.getFirebaseAuthInstance();
 
         mLocalStorageDir = getExternalFilesDir(Environment.DIRECTORY_DCIM);
@@ -160,6 +171,31 @@ public class ChatActivity extends AppCompatActivity {
         List<Message> messages = new ArrayList<>();
         mMessageAdapter = new ChatMessageListAdapter(this, R.layout.item_chat_message_friend, messages);
         mMessagesListView.setAdapter(mMessageAdapter);
+
+        // Load users - TREBA SACEKATI DA SE UCITAJU, PA TEK ONDA DOZVOLITI SLANJE PORUKE, MRZI ME :D
+        mUserService.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid(), new UserCallback() {
+            @Override
+            public void notify(List<User> users) {
+
+            }
+
+            @Override
+            public void notify(User user) {
+                currentUser = user;
+            }
+        });
+        mUserService.getUser(FirebaseAuth.getInstance().getCurrentUser().getUid(), new UserCallback() {
+            @Override
+            public void notify(List<User> users) {
+
+            }
+
+            @Override
+            public void notify(User user) {
+                otherUser = user;
+            }
+        });
+
 
         final String userId = mAuthService.getUserId();
 
@@ -248,6 +284,8 @@ public class ChatActivity extends AppCompatActivity {
 
                 String id = mMessagesDatabaseReference.push().getKey();
                 mMessagesDatabaseReference.child(id).setValue(message);
+
+                sendNotification(message);
 
                 mMessageEditText.setText("");
             }
@@ -475,6 +513,18 @@ public class ChatActivity extends AppCompatActivity {
             case RC_AUDIO_CAPTURE : return MessageType.SOUND;
             default: return MessageType.TEXT;
         }
+    }
+
+    private void sendNotification(final Message message){
+        FcmNotificationBuilder.initialize()
+                .title(currentUser.getName())
+                .message(message.getContent())
+                .username(currentUser.getName())
+                .uid(mChatContactFirebaseUserId)
+                .firebaseToken(currentUser.getFcmToken())
+                .conversationId(chatContact.getId().toString())
+                .receiverFirebaseToken(otherUser.getFcmToken())
+                .send();
     }
 
 }
